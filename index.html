@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Jai Kishan Pal — Finance Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --gold: #C8A84A;
+  --gold-light: #F0D980;
+  --gold-dim: #7a6530;
+  --bg: #07070E;
+  --bg2: #0d0d1a;
+  --bg3: #111120;
+  --text: #E2DAC8;
+  --text-dim: #8888A0;
+  --text-muted: #505065;
+  --border: rgba(255,255,255,0.07);
+  --border-gold: rgba(200,168,74,0.25);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Crimson Pro',Georgia,serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:2px;}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(7,7,14,0.88);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  padding:0 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  height:60px;
+}
+.nav-logo{
+  font-family:'Playfair Display',serif;
+  font-size:16px;font-weight:700;
+  background:linear-gradient(130deg,#F0E8D8,var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:1px;
+}
+.nav-links{display:flex;gap:28px;}
+.nav-links a{
+  font-size:12px;color:var(--text-muted);text-decoration:none;
+  letter-spacing:2px;text-transform:uppercase;
+  transition:color 0.2s;
+  font-family:'Crimson Pro',serif;
+}
+.nav-links a:hover{color:var(--gold);}
+.nav-status{
+  font-size:10px;font-family:monospace;
+  background:rgba(16,185,129,0.1);
+  color:#10B981;border:1px solid rgba(16,185,129,0.25);
+  padding:4px 10px;border-radius:999px;
+  display:flex;align-items:center;gap:6px;
+}
+.status-dot{
+  width:6px;height:6px;border-radius:50%;background:#10B981;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+/* HERO */
+.hero{
+  min-height:100vh;
+  display:flex;align-items:center;
+  padding:100px 32px 80px;
+  position:relative;overflow:hidden;
+  background:linear-gradient(160deg,#0d0d1a 0%,#0a1020 50%,var(--bg) 100%);
+}
+.hero-glow{
+  position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(200,168,74,0.08) 0%,transparent 55%),
+    radial-gradient(ellipse at 80% 30%, rgba(59,130,246,0.06) 0%,transparent 55%);
+}
+.hero-grid{
+  position:absolute;inset:0;pointer-events:none;opacity:0.03;
+  background-image:linear-gradient(rgba(200,168,74,0.5) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(200,168,74,0.5) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+.hero-inner{
+  position:relative;max-width:900px;margin:0 auto;width:100%;
+  display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;
+}
+.hero-left{}
+.hero-eyebrow{
+  font-size:10px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--gold);font-family:monospace;margin-bottom:20px;
+  display:flex;align-items:center;gap:10px;
+}
+.hero-eyebrow::before{content:'';display:block;width:30px;height:1px;background:var(--gold);}
+.hero-name{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(36px,5vw,58px);font-weight:800;line-height:1.05;
+  margin-bottom:8px;
+  background:linear-gradient(130deg,#F0E8D8 0%,var(--gold) 60%,#F0E8D8 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-title{
+  font-size:16px;color:var(--text-dim);margin-bottom:24px;
+  font-weight:300;letter-spacing:1px;
+}
+.hero-bio{
+  font-size:16px;color:#9090A8;line-height:1.8;margin-bottom:32px;
+  font-weight:300;
+}
+.hero-bio strong{color:var(--text);}
+.hero-location{
+  display:flex;align-items:center;gap:8px;
+  font-size:13px;color:var(--text-muted);margin-bottom:32px;
+  font-family:monospace;
+}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.btn-primary{
+  padding:12px 24px;border-radius:8px;font-size:13px;font-weight:600;
+  background:var(--gold);color:#07070E;text-decoration:none;
+  transition:all 0.2s;font-family:'Crimson Pro',serif;
+  border:none;cursor:pointer;
+}
+.btn-primary:hover{background:var(--gold-light);transform:translateY(-1px);}
+.btn-secondary{
+  padding:12px 24px;border-radius:8px;font-size:13px;
+  background:transparent;color:var(--text);text-decoration:none;
+  border:1px solid var(--border-gold);transition:all 0.2s;
+  font-family:'Crimson Pro',serif;
+}
+.btn-secondary:hover{background:rgba(200,168,74,0.08);border-color:var(--gold);}
+
+/* HERO RIGHT — card */
+.hero-card{
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border-gold);
+  border-radius:20px;padding:32px;
+  position:relative;overflow:hidden;
+}
+.hero-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.hero-card-label{
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold);font-family:monospace;margin-bottom:20px;
+}
+.stat-row{display:flex;flex-direction:column;gap:16px;}
+.stat-item{
+  display:flex;justify-content:space-between;align-items:center;
+  padding-bottom:14px;border-bottom:1px solid var(--border);
+}
+.stat-item:last-child{border-bottom:none;padding-bottom:0;}
+.stat-label{font-size:12px;color:var(--text-muted);}
+.stat-value{font-size:13px;color:var(--text);font-weight:600;text-align:right;}
+.stat-value.gold{color:var(--gold);}
+.cert-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;padding:3px 8px;border-radius:4px;margin:2px;
+  font-family:monospace;
+}
+.cert-done{background:rgba(16,185,129,0.1);color:#10B981;border:1px solid rgba(16,185,129,0.2);}
+.cert-progress{background:rgba(59,130,246,0.1);color:#60A5FA;border:1px solid rgba(59,130,246,0.2);}
+
+/* SECTION SHARED */
+section{padding:80px 32px;}
+.section-inner{max-width:900px;margin:0 auto;}
+.section-eyebrow{
+  font-size:10px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--gold);font-family:monospace;margin-bottom:12px;
+  display:flex;align-items:center;gap:10px;
+}
+.section-eyebrow::before{content:'';display:block;width:20px;height:1px;background:var(--gold);}
+.section-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(24px,3vw,36px);font-weight:700;
+  color:#EEE5D5;margin-bottom:40px;line-height:1.2;
+}
+
+/* ABOUT */
+#about{background:var(--bg);}
+.about-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:48px;align-items:start;}
+.about-text p{
+  font-size:16px;color:#9090A8;line-height:1.85;margin-bottom:18px;
+  font-weight:300;
+}
+.about-text p strong{color:var(--text);}
+.about-text p em{color:var(--gold);font-style:italic;}
+.about-langs{margin-top:24px;}
+.about-langs-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;font-family:monospace;}
+.lang-tag{
+  display:inline-block;margin:3px;padding:5px 12px;border-radius:6px;
+  font-size:12px;background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);color:var(--text-dim);
+}
+.about-info{display:flex;flex-direction:column;gap:12px;}
+.info-card{
+  background:rgba(255,255,255,0.025);border:1px solid var(--border);
+  border-radius:12px;padding:16px 18px;
+  transition:border-color 0.2s;
+}
+.info-card:hover{border-color:var(--border-gold);}
+.info-card-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-family:monospace;}
+.info-card-value{font-size:14px;color:var(--text);font-weight:600;}
+.info-card-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
+
+/* EDUCATION */
+#education{
+  background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
+  border-top:1px solid var(--border);
+}
+.edu-cards{display:flex;flex-direction:column;gap:16px;}
+.edu-card{
+  background:rgba(255,255,255,0.025);
+  border:1px solid var(--border);border-radius:16px;
+  padding:28px 32px;display:flex;gap:24px;align-items:flex-start;
+  transition:all 0.3s;position:relative;overflow:hidden;
+}
+.edu-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--gold);opacity:0;transition:opacity 0.3s;
+}
+.edu-card:hover{border-color:var(--border-gold);transform:translateX(4px);}
+.edu-card:hover::before{opacity:1;}
+.edu-card:first-child{border-color:var(--border-gold);}
+.edu-card:first-child::before{opacity:1;}
+.edu-icon{
+  width:48px;height:48px;border-radius:12px;
+  background:rgba(200,168,74,0.1);border:1px solid var(--border-gold);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+}
+.edu-degree{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#EEE5D5;margin-bottom:4px;}
+.edu-school{font-size:14px;color:var(--gold);margin-bottom:6px;}
+.edu-meta{font-size:12px;color:var(--text-muted);font-family:monospace;}
+.edu-badge{
+  margin-left:auto;flex-shrink:0;
+  font-size:10px;padding:4px 10px;border-radius:6px;font-family:monospace;
+  background:rgba(200,168,74,0.1);color:var(--gold);border:1px solid var(--border-gold);
+  height:fit-content;
+}
+
+/* SKILLS */
+#skills{background:var(--bg2);border-top:1px solid var(--border);}
+.skills-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.skill-card{
+  background:rgba(255,255,255,0.025);border:1px solid var(--border);
+  border-radius:14px;padding:22px 20px;
+  transition:all 0.25s;cursor:default;
+}
+.skill-card:hover{border-color:var(--border-gold);background:rgba(200,168,74,0.04);transform:translateY(-2px);}
+.skill-icon{font-size:24px;margin-bottom:12px;}
+.skill-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.skill-level{font-size:11px;color:var(--text-muted);margin-bottom:12px;}
+.skill-bar-wrap{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;}
+.skill-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--gold),var(--gold-light));}
+
+/* CERTS */
+.certs-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:40px;}
+.cert-card{
+  background:rgba(255,255,255,0.025);border:1px solid var(--border);
+  border-radius:14px;padding:22px 24px;
+  display:flex;align-items:center;gap:16px;
+  transition:all 0.25s;
+}
+.cert-card:hover{border-color:var(--border-gold);transform:translateY(-2px);}
+.cert-card.active{border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.04);}
+.cert-card.inprogress{border-color:rgba(59,130,246,0.3);background:rgba(59,130,246,0.04);}
+.cert-icon-wrap{
+  width:44px;height:44px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+}
+.cert-card.active .cert-icon-wrap{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);}
+.cert-card.inprogress .cert-icon-wrap{background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);}
+.cert-card.planned .cert-icon-wrap{background:rgba(255,255,255,0.04);border:1px solid var(--border);}
+.cert-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.cert-issuer{font-size:12px;color:var(--text-muted);}
+.cert-status{
+  margin-left:auto;font-size:10px;font-family:monospace;padding:3px 8px;
+  border-radius:4px;flex-shrink:0;
+}
+.cert-card.active .cert-status{background:rgba(16,185,129,0.1);color:#10B981;border:1px solid rgba(16,185,129,0.2);}
+.cert-card.inprogress .cert-status{background:rgba(59,130,246,0.1);color:#60A5FA;border:1px solid rgba(59,130,246,0.2);}
+.cert-card.planned .cert-status{background:rgba(255,255,255,0.04);color:var(--text-muted);border:1px solid var(--border);}
+
+/* PROJECT */
+#projects{background:var(--bg);border-top:1px solid var(--border);}
+.project-card{
+  background:rgba(255,255,255,0.025);border:1px solid var(--border-gold);
+  border-radius:20px;overflow:hidden;
+  transition:all 0.3s;
+}
+.project-card:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(200,168,74,0.08);}
+.project-top{
+  background:linear-gradient(135deg,rgba(200,168,74,0.1) 0%,rgba(7,7,14,0.9) 100%);
+  padding:36px 36px 28px;position:relative;overflow:hidden;
+  border-bottom:1px solid var(--border-gold);
+}
+.project-top::after{
+  content:'📊';position:absolute;right:32px;top:50%;transform:translateY(-50%);
+  font-size:80px;opacity:0.07;
+}
+.project-tag{
+  display:inline-block;font-size:10px;font-family:monospace;letter-spacing:2px;
+  text-transform:uppercase;color:var(--gold);
+  background:rgba(200,168,74,0.1);border:1px solid var(--border-gold);
+  padding:4px 10px;border-radius:4px;margin-bottom:14px;
+}
+.project-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(17px,2.5vw,22px);font-weight:700;color:#EEE5D5;
+  line-height:1.3;margin-bottom:8px;
+}
+.project-subtitle{font-size:14px;color:var(--text-muted);}
+.project-body{padding:28px 36px;}
+.project-desc{font-size:15px;color:#9090A8;line-height:1.8;margin-bottom:24px;font-weight:300;}
+.project-desc strong{color:var(--text);}
+.project-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;}
+.project-tag-item{
+  font-size:11px;padding:5px 12px;border-radius:6px;font-family:monospace;
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-dim);
+}
+.project-highlights{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.highlight{
+  background:rgba(200,168,74,0.04);border:1px solid var(--border-gold);
+  border-radius:10px;padding:14px;text-align:center;
+}
+.highlight-num{font-size:20px;font-weight:700;color:var(--gold);font-family:'Playfair Display',serif;}
+.highlight-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px;font-family:monospace;}
+
+/* CONTACT */
+#contact{
+  background:linear-gradient(160deg,var(--bg2) 0%,#0a1020 60%,var(--bg) 100%);
+  border-top:1px solid var(--border);
+}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;}
+.contact-intro{font-size:16px;color:#9090A8;line-height:1.8;margin-bottom:32px;font-weight:300;}
+.contact-intro strong{color:var(--text);}
+.contact-links{display:flex;flex-direction:column;gap:12px;}
+.contact-link{
+  display:flex;align-items:center;gap:14px;
+  padding:16px 18px;border-radius:12px;text-decoration:none;
+  background:rgba(255,255,255,0.025);border:1px solid var(--border);
+  transition:all 0.25s;
+}
+.contact-link:hover{border-color:var(--border-gold);background:rgba(200,168,74,0.05);transform:translateX(4px);}
+.contact-link-icon{
+  width:40px;height:40px;border-radius:10px;
+  background:rgba(200,168,74,0.1);border:1px solid var(--border-gold);
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+}
+.contact-link-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-family:monospace;margin-bottom:2px;}
+.contact-link-value{font-size:14px;color:var(--text);font-weight:600;}
+.contact-card{
+  background:rgba(255,255,255,0.025);border:1px solid var(--border-gold);
+  border-radius:20px;padding:32px;position:relative;overflow:hidden;
+}
+.contact-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.contact-card-title{
+  font-family:'Playfair Display',serif;font-size:20px;font-weight:700;
+  color:#EEE5D5;margin-bottom:8px;
+}
+.contact-card-sub{font-size:14px;color:var(--text-muted);margin-bottom:24px;line-height:1.6;}
+.open-to{display:flex;flex-direction:column;gap:10px;}
+.open-to-item{
+  display:flex;align-items:center;gap:10px;
+  font-size:13px;color:#9090A8;
+}
+.open-to-item::before{
+  content:'';display:block;width:6px;height:6px;border-radius:50%;
+  background:var(--gold);flex-shrink:0;
+}
+
+/* FOOTER */
+footer{
+  padding:32px;text-align:center;
+  border-top:1px solid var(--border);
+  font-size:12px;color:var(--text-muted);font-family:monospace;
+}
+footer span{color:var(--gold);}
+
+/* FADE IN ANIMATION */
+.fade-in{opacity:0;transform:translateY(24px);transition:opacity 0.6s ease,transform 0.6s ease;}
+.fade-in.visible{opacity:1;transform:translateY(0);}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .hero-inner{grid-template-columns:1fr;}
+  .hero-card{display:none;}
+  .about-grid{grid-template-columns:1fr;}
+  .skills-grid{grid-template-columns:repeat(2,1fr);}
+  .certs-grid{grid-template-columns:1fr;}
+  .contact-grid{grid-template-columns:1fr;}
+  .project-highlights{grid-template-columns:1fr;}
+  .nav-links{display:none;}
+  nav{padding:0 20px;}
+  section{padding:60px 20px;}
+  .hero{padding:80px 20px 60px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">JKP</div>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#education">Education</a>
+    <a href="#skills">Skills</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    Open to Opportunities
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-glow"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="hero-left fade-in">
+      <div class="hero-eyebrow">Finance Professional</div>
+      <div class="hero-name">Jai Kishan<br/>Pal</div>
+      <div class="hero-title">MSc Finance · Nottingham Trent University</div>
+      <div class="hero-location">📍 Nottingham, United Kingdom</div>
+      <p class="hero-bio">
+        A <strong>finance graduate</strong> with an international academic background, currently building
+        industry-standard skills through the <strong>FMVA certification</strong> and the ACCA qualification pathway.
+        Passionate about <em>financial modelling, forecasting,</em> and helping organisations make
+        smarter decisions through data-driven analysis.
+      </p>
+      <div class="hero-btns">
+        <a href="#contact" class="btn-primary">Get In Touch</a>
+        <a href="#projects" class="btn-secondary">View My Work</a>
+      </div>
+    </div>
+
+    <div class="hero-card fade-in" style="transition-delay:0.2s">
+      <div class="hero-card-label">At a Glance</div>
+      <div class="stat-row">
+        <div class="stat-item">
+          <span class="stat-label">Current Focus</span>
+          <span class="stat-value gold">FMVA Certification</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Location</span>
+          <span class="stat-value">Nottingham, UK 🇬🇧</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Education</span>
+          <span class="stat-value">MSc Finance, NTU</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Certifications</span>
+          <div>
+            <span class="cert-badge cert-done">✓ BMC</span>
+            <span class="cert-badge cert-progress">⟳ FMVA</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Languages</span>
+          <span class="stat-value">English · Hindi</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Availability</span>
+          <span class="stat-value gold">Immediately</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-inner">
+    <div class="section-eyebrow">About Me</div>
+    <div class="section-title">Who I Am</div>
+    <div class="about-grid fade-in">
+      <div class="about-text">
+        <p>
+          I'm <strong>Jai Kishan Pal</strong>, a finance graduate currently based in
+          <strong>Nottingham, United Kingdom</strong>. I hold a <strong>BSc from Shyam Lal Pandaviya
+          Government College, India</strong>, and an <strong>MSc in Finance from Nottingham Trent
+          University</strong> — where I developed a strong foundation in financial theory,
+          quantitative analysis, and corporate finance.
+        </p>
+        <p>
+          My academic journey took me from India to the UK, giving me a
+          <em>cross-cultural perspective on business and finance</em> that I believe is a genuine
+          strength in today's global markets. During my MSc, I completed a dissertation on
+          <strong>revenue forecasting and break-even analysis for fintech startups</strong> —
+          applying real financial modelling techniques to a contemporary, fast-growing industry.
+        </p>
+        <p>
+          I'm now working toward becoming a well-rounded finance professional by pursuing the
+          <strong>FMVA certification</strong>, Excel and Power BI qualifications, and the
+          <strong>ACCA Applied Knowledge</strong> pathway. My goal is to secure a
+          <em>finance analyst or graduate role in the UK</em> where I can contribute from day one.
+        </p>
+        <div class="about-langs">
+          <div class="about-langs-label">Languages</div>
+          <span class="lang-tag">🇬🇧 English — Fluent</span>
+          <span class="lang-tag">🇮🇳 Hindi — Native</span>
+        </div>
+      </div>
+      <div class="about-info">
+        <div class="info-card">
+          <div class="info-card-label">Location</div>
+          <div class="info-card-value">Nottingham, United Kingdom</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Current Status</div>
+          <div class="info-card-value">Seeking Finance Roles</div>
+          <div class="info-card-sub">Open to analyst, graduate & intern positions</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Academic Background</div>
+          <div class="info-card-value">MSc Finance · BSc</div>
+          <div class="info-card-sub">Nottingham Trent University + India</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Core Interests</div>
+          <div class="info-card-value">Financial Modelling</div>
+          <div class="info-card-sub">FP&A · Valuation · Forecasting · FinTech</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Right to Work</div>
+          <div class="info-card-value">UK Graduate Visa</div>
+          <div class="info-card-sub">Eligible to work in the UK</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="section-inner">
+    <div class="section-eyebrow">Education</div>
+    <div class="section-title">Academic Background</div>
+    <div class="edu-cards fade-in">
+
+      <div class="edu-card">
+        <div class="edu-icon">🎓</div>
+        <div>
+          <div class="edu-degree">MSc Finance</div>
+          <div class="edu-school">Nottingham Trent University</div>
+          <div class="edu-meta">Nottingham, United Kingdom · 2024–2025</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-top:8px;line-height:1.6;">
+            Advanced study in financial theory, corporate finance, and quantitative methods.
+            Dissertation: Revenue Forecasting & Break-Even Analysis for Fintech Startups.
+          </p>
+        </div>
+        <div class="edu-badge">Latest</div>
+      </div>
+
+      <div class="edu-card">
+        <div class="edu-icon">📚</div>
+        <div>
+          <div class="edu-degree">BSc (Bachelor of Science)</div>
+          <div class="edu-school">Shyam Lal Pandaviya Government College</div>
+          <div class="edu-meta">India</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-top:8px;line-height:1.6;">
+            Undergraduate foundation providing grounding in core business and scientific principles.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS & CERTS -->
+<section id="skills">
+  <div class="section-inner">
+    <div class="section-eyebrow">Skills & Tools</div>
+    <div class="section-title">What I Work With</div>
+    <div class="skills-grid fade-in">
+      <div class="skill-card">
+        <div class="skill-icon">📊</div>
+        <div class="skill-name">Microsoft Excel</div>
+        <div class="skill-level">Financial Modelling · Advanced</div>
+        <div class="skill-bar-wrap"><div class="skill-bar" style="width:80%"></div></div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">📉</div>
+        <div class="skill-name">Power BI</div>
+        <div class="skill-level">Data Visualisation · Intermediate</div>
+        <div class="skill-bar-wrap"><div class="skill-bar" style="width:65%"></div></div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🌐</div>
+        <div class="skill-name">Bloomberg Terminal</div>
+        <div class="skill-level">Market Data · Certified (BMC)</div>
+        <div class="skill-bar-wrap"><div class="skill-bar" style="width:70%"></div></div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">💹</div>
+        <div class="skill-name">Financial Modelling</div>
+        <div class="skill-level">3-Statement · DCF · Forecasting</div>
+        <div class="skill-bar-wrap"><div class="skill-bar" style="width:72%"></div></div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🔍</div>
+        <div class="skill-name">Financial Analysis</div>
+        <div class="skill-level">Ratio Analysis · Valuation</div>
+        <div class="skill-bar-wrap"><div class="skill-bar" style="width:75%"></div></div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">📋</div>
+        <div class="skill-name">Accounting (ACCA)</div>
+        <div class="skill-level">Applied Knowledge · In Progress</div>
+        <div class="skill-bar-wrap"><div class="skill-bar" style="width:45%"></div></div>
+      </div>
+    </div>
+
+    <!-- CERTS -->
+    <div style="margin-top:56px;">
+      <div class="section-eyebrow">Certifications</div>
+      <div class="section-title" style="margin-bottom:24px;">Credentials</div>
+      <div class="certs-grid fade-in">
+        <div class="cert-card active">
+          <div class="cert-icon-wrap">🏆</div>
+          <div>
+            <div class="cert-name">Bloomberg Market Concepts</div>
+            <div class="cert-issuer">Bloomberg LP</div>
+          </div>
+          <div class="cert-status">Completed</div>
+        </div>
+        <div class="cert-card inprogress">
+          <div class="cert-icon-wrap">📊</div>
+          <div>
+            <div class="cert-name">FMVA — Financial Modelling & Valuation</div>
+            <div class="cert-issuer">Corporate Finance Institute</div>
+          </div>
+          <div class="cert-status">In Progress</div>
+        </div>
+        <div class="cert-card planned">
+          <div class="cert-icon-wrap">📗</div>
+          <div>
+            <div class="cert-name">ACCA Applied Knowledge</div>
+            <div class="cert-issuer">ACCA Global</div>
+          </div>
+          <div class="cert-status">Planned</div>
+        </div>
+        <div class="cert-card planned">
+          <div class="cert-icon-wrap">📉</div>
+          <div>
+            <div class="cert-name">MOS Excel Expert + Power BI</div>
+            <div class="cert-issuer">Microsoft</div>
+          </div>
+          <div class="cert-status">Planned</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECT -->
+<section id="projects">
+  <div class="section-inner">
+    <div class="section-eyebrow">Projects</div>
+    <div class="section-title">Featured Work</div>
+    <div class="project-card fade-in">
+      <div class="project-top">
+        <div class="project-tag">MSc Dissertation · Financial Research</div>
+        <div class="project-title">Revenue Forecasting & Break-Even Analysis<br/>for Subscription-Based Fintech Startups</div>
+        <div class="project-subtitle">Nottingham Trent University · 2024–2025</div>
+      </div>
+      <div class="project-body">
+        <p class="project-desc">
+          This dissertation examined how <strong>subscription-based fintech companies</strong> can
+          accurately predict future revenue and determine the point at which they become profitable.
+          The research developed an original <strong>financial framework and forecasting model</strong>
+          built around key drivers including customer acquisition rates, subscription pricing tiers,
+          churn rates, and operating cost structures.
+        </p>
+        <p class="project-desc">
+          Using this model, the study analysed the <strong>break-even timeline</strong> for fintech
+          startups — identifying the revenue thresholds required to cover fixed and variable costs.
+          The findings highlighted how <em>accurate financial modelling supports strategic decision-making,
+          risk management, and investor confidence</em> in early-stage fintech businesses.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag-item">Revenue Forecasting</span>
+          <span class="project-tag-item">Break-Even Analysis</span>
+          <span class="project-tag-item">Financial Modelling</span>
+          <span class="project-tag-item">FinTech</span>
+          <span class="project-tag-item">Subscription Economics</span>
+          <span class="project-tag-item">Startup Finance</span>
+        </div>
+        <div class="project-highlights">
+          <div class="highlight">
+            <div class="highlight-num">3+</div>
+            <div class="highlight-label">Financial Models Built</div>
+          </div>
+          <div class="highlight">
+            <div class="highlight-num">MSc</div>
+            <div class="highlight-label">University Research</div>
+          </div>
+          <div class="highlight">
+            <div class="highlight-num">FinTech</div>
+            <div class="highlight-label">Industry Focus</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-inner">
+    <div class="section-eyebrow">Contact</div>
+    <div class="section-title">Let's Connect</div>
+    <div class="contact-grid fade-in">
+      <div>
+        <p class="contact-intro">
+          I'm actively looking for <strong>finance analyst, graduate scheme, and internship
+          roles in the UK</strong>. If you're a recruiter, hiring manager, or fellow finance
+          professional — I'd love to hear from you.
+        </p>
+        <div class="contact-links">
+          <a href="mailto:jaikishanpal844@gmail.com" class="contact-link">
+            <div class="contact-link-icon">✉️</div>
+            <div>
+              <div class="contact-link-label">Email</div>
+              <div class="contact-link-value">jaikishanpal844@gmail.com</div>
+            </div>
+          </a>
+          <a href="https://www.linkedin.com/in/jaik-pal/" target="_blank" class="contact-link">
+            <div class="contact-link-icon">💼</div>
+            <div>
+              <div class="contact-link-label">LinkedIn</div>
+              <div class="contact-link-value">linkedin.com/in/jaik-pal</div>
+            </div>
+          </a>
+          <div class="contact-link" style="cursor:default;">
+            <div class="contact-link-icon">📍</div>
+            <div>
+              <div class="contact-link-label">Location</div>
+              <div class="contact-link-value">Nottingham, United Kingdom</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-card-title">Open To</div>
+        <div class="contact-card-sub">
+          I'm available immediately and actively applying to UK finance roles across these areas:
+        </div>
+        <div class="open-to">
+          <div class="open-to-item">Finance Analyst (Graduate)</div>
+          <div class="open-to-item">FP&A Analyst</div>
+          <div class="open-to-item">Investment Analyst</div>
+          <div class="open-to-item">Finance Graduate Schemes</div>
+          <div class="open-to-item">Finance Internships</div>
+          <div class="open-to-item">Corporate Finance Roles</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 <span>Jai Kishan Pal</span> · Nottingham, UK · Built with purpose 🇬🇧</p>
+</footer>
+
+<script>
+// Fade-in on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// Smooth active nav highlight
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 100) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.style.color = a.getAttribute('href') === '#'+current ? '#C8A84A' : '';
+  });
+});
+</script>
+</body>
+</html>
