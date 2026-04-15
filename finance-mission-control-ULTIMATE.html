@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MISSION CONTROL · Finance Career Tracker</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#080b12;--bg2:#0c1018;--bg3:#111722;
+  --surface:rgba(255,255,255,0.025);--surface2:rgba(255,255,255,0.045);
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);
+  --text:#e4e2de;--text2:#8b95a8;--text3:#4a5568;
+  --fire:#FF6B2B;--green:#00E676;--green2:#10B981;
+  --blue:#3B82F6;--purple:#A855F7;--amber:#F59E0B;
+  --red:#EF4444;--cyan:#22D3EE;--pink:#EC4899;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 0%,rgba(59,130,246,0.04) 0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(168,85,247,0.03) 0%,transparent 50%);pointer-events:none;z-index:0}
+
+/* ═══ TWO-ROW STATS BAR ═══ */
+.stats-bar{position:sticky;top:0;z-index:100;background:rgba(8,11,18,0.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:8px 16px 8px;display:flex;flex-direction:column;gap:6px}
+.stats-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.stats-row-1{padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.stat-card{display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;flex-shrink:0;cursor:default}
+.stat-icon{font-size:13px}
+.stat-val{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;white-space:nowrap}
+.stat-label{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap}
+.stat-countdown .stat-val{color:var(--red)}
+.stat-hours .stat-val{color:var(--cyan)}
+.stat-progress .stat-val{color:var(--green)}
+.stat-day .stat-val{color:var(--amber)}
+.stat-gym .stat-val{color:var(--fire)}
+.stat-gym-pct .stat-val{color:var(--green2)}
+.stat-jobs .stat-val{color:var(--blue)}
+.stat-interviews .stat-val{color:var(--purple)}
+.quote-bar{flex:1;min-width:120px;text-align:right;font-size:10px;color:var(--text3);font-style:italic;padding-right:4px;display:none}
+@media(min-width:900px){.quote-bar{display:block}}
+
+/* ═══ CALENDAR BUTTON ═══ */
+.cal-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0}
+.cal-btn:hover,.cal-btn.open{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,0.08)}
+
+/* ═══ CALENDAR WIDGET ═══ */
+.cal-widget{position:fixed;top:115px;right:14px;z-index:200;background:var(--bg3);border:1px solid var(--border2);border-radius:14px;padding:16px;width:292px;box-shadow:0 24px 64px rgba(0,0,0,0.7);display:none}
+.cal-widget.show{display:block}
+.cal-widget-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-month-title{font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:var(--text)}
+.cal-nav{display:flex;gap:4px}
+.cal-nav-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:none;color:var(--text2);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.cal-nav-btn:hover{border-color:var(--amber);color:var(--amber)}
+.cal-stats-row{display:flex;gap:8px;margin-bottom:12px}
+.cal-stat-box{flex:1;text-align:center;padding:8px 6px;background:var(--surface);border:1px solid var(--border);border-radius:8px}
+.cal-stat-val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;color:var(--fire)}
+.cal-stat-val.pct{color:var(--green2)}
+.cal-stat-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-top:2px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-dh{font-size:8px;color:var(--text3);text-align:center;padding:3px 0;font-family:'JetBrains Mono',monospace;font-weight:700}
+.cal-day{aspect-ratio:1;border-radius:6px;border:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.12s;gap:1px}
+.cal-day:hover{border-color:rgba(0,230,118,0.4);background:rgba(0,230,118,0.06)}
+.cal-day.checked{background:rgba(0,230,118,0.12);border-color:rgba(0,230,118,0.35)}
+.cal-day.today{border-color:var(--amber)!important}
+.cal-day.future{opacity:0.25;cursor:default;pointer-events:none}
+.cal-day.empty{border:none;background:none;cursor:default}
+.cal-day-num{font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text2);line-height:1}
+.cal-day.checked .cal-day-num{color:var(--green)}
+.cal-day.today .cal-day-num{color:var(--amber)}
+.cal-day-ico{font-size:7px;line-height:1}
+
+/* ═══ TIMER IN STATS BAR ═══ */
+.stat-timer{display:flex;align-items:center;gap:6px;padding:4px 10px;background:linear-gradient(135deg,rgba(0,230,118,0.06),rgba(34,211,238,0.06));border:1px solid rgba(0,230,118,0.15);border-radius:10px;position:relative;flex-shrink:0;min-width:185px}
+.stat-timer.running{border-color:var(--green);animation:timerGlow 2s infinite}
+@keyframes timerGlow{0%,100%{box-shadow:0 0 0 0 rgba(0,230,118,0)}50%{box-shadow:0 0 10px 2px rgba(0,230,118,0.15)}}
+.st-display{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--text);letter-spacing:1px;min-width:70px}
+.stat-timer.running .st-display{color:var(--green)}
+.st-block-name{font-size:9px;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;flex:1;min-width:50px}
+.stat-timer.running .st-block-name{color:var(--green2)}
+.st-buttons{display:flex;gap:4px}
+.st-btn{width:28px;height:28px;border-radius:7px;border:none;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.st-btn:hover{transform:scale(1.1)}
+.st-start{background:var(--green);color:#080b12}
+.st-stop{background:var(--red);color:#fff}
+.st-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:6px;z-index:150;min-width:170px;box-shadow:0 12px 32px rgba(0,0,0,0.5)}
+.st-menu.show{display:block}
+.st-menu-item{padding:8px 12px;border-radius:7px;font-size:12px;color:var(--text);cursor:pointer;transition:all 0.15s;font-family:'Outfit',sans-serif}
+.st-menu-item:hover{background:rgba(0,230,118,0.1);color:var(--green)}
+
+/* ═══ MAIN CONTAINER ═══ */
+.container{max-width:960px;margin:0 auto;padding:20px 20px 60px;position:relative;z-index:1}
+
+/* ═══ HEADER ═══ */
+.header{text-align:center;padding:28px 0 20px}
+.header-tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--amber);text-transform:uppercase;margin-bottom:8px}
+.header h1{font-family:'Sora',sans-serif;font-size:clamp(22px,5vw,38px);font-weight:800;background:linear-gradient(135deg,#fff 0%,var(--amber) 50%,var(--fire) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.header-sub{font-size:13px;color:var(--text2);font-weight:300}
+
+/* ═══ MAIN VIEW TABS ═══ */
+.view-tabs{display:flex;gap:8px;margin-bottom:20px}
+.view-tab{flex:1;padding:11px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:center;transition:all 0.2s;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;color:var(--text2);user-select:none}
+.view-tab:hover{border-color:var(--border2);color:var(--text)}
+.view-tab.active{background:rgba(245,158,11,0.07);border-color:rgba(245,158,11,0.4);color:var(--amber)}
+
+/* ═══ OVERALL PROGRESS ═══ */
+.overall{margin:0 0 20px;padding:18px;background:linear-gradient(135deg,rgba(0,230,118,0.04) 0%,rgba(59,130,246,0.04) 100%);border:1px solid rgba(0,230,118,0.15);border-radius:14px}
+.overall-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.overall-label{font-size:13px;color:var(--text2)}
+.overall-label strong{color:var(--text)}
+.overall-pct{font-family:'Sora',sans-serif;font-size:26px;font-weight:800;color:var(--green)}
+.overall-bar{height:10px;background:rgba(255,255,255,0.06);border-radius:5px;overflow:hidden}
+.overall-bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--green),var(--cyan),var(--blue),var(--purple));transition:width 0.6s ease}
+
+/* ═══ PHASES ═══ */
+.phases{display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.phases::-webkit-scrollbar{height:3px}
+.phases::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.phase-card{flex:0 0 auto;min-width:128px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.phase-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.phase-card.active{border-color:var(--phase-color)}
+.phase-card.active::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--phase-color)}
+.phase-emoji{font-size:15px;margin-bottom:3px}
+.phase-name{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px;white-space:nowrap}
+.phase-dates{font-size:9px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:5px}
+.phase-bar{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.phase-bar-fill{height:100%;border-radius:2px;transition:width 0.4s}
+.phase-stat{font-size:9px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:3px}
+
+/* ═══ WEEK NAV ═══ */
+.week-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px}
+.week-nav-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0}
+.week-nav-btn:hover{border-color:var(--amber);color:var(--amber)}
+.week-nav-btn:disabled{opacity:0.3;cursor:default}
+.week-info{text-align:center;flex:1}
+.week-number{font-family:'Sora',sans-serif;font-size:18px;font-weight:800;color:var(--text)}
+.week-title{font-size:13px;color:var(--amber);font-weight:600;margin-top:2px}
+.week-dates{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:2px}
+.week-intensity{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* ═══ DAY CARDS ═══ */
+.day-card{margin-bottom:10px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:var(--bg2);transition:border-color 0.2s}
+.day-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface);cursor:pointer;user-select:none}
+.day-name{font-family:'Sora',sans-serif;font-size:13px;font-weight:700}
+.day-schedule{font-size:10px;color:var(--text3);margin-top:2px}
+.day-progress{font-size:11px;font-family:'JetBrains Mono',monospace}
+.day-body{padding:8px 12px 12px;display:flex;flex-direction:column;gap:4px}
+.day-body.collapsed{display:none}
+.day-time-label{font-size:9px;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:1.5px;padding:6px 4px 2px;display:flex;align-items:center;gap:6px}
+.day-time-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ═══ REST DAY ═══ */
+.rest-day{padding:18px;text-align:center;background:linear-gradient(135deg,rgba(255,255,255,0.015),rgba(255,255,255,0.005));border-radius:12px;border:1px solid var(--border);margin-bottom:10px}
+.rest-emoji{font-size:24px;margin-bottom:5px}
+.rest-title{font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:var(--text2);margin-bottom:3px}
+.rest-sub{font-size:11px;color:var(--text3)}
+
+/* ═══ TASKS ═══ */
+.task{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:all 0.15s;background:rgba(255,255,255,0.015);border:1px solid transparent;user-select:none}
+.task:hover{background:var(--surface2);border-color:var(--border)}
+.task.done{opacity:0.5}
+.task.done .task-name{text-decoration:line-through;color:var(--text3)}
+.task.project{border-left:3px solid var(--purple);background:rgba(168,85,247,0.03)}
+.task.project:hover{background:rgba(168,85,247,0.06)}
+.task.english{border-left:3px solid var(--cyan);background:rgba(34,211,238,0.02)}
+.task.job{border-left:3px solid var(--pink);background:rgba(236,72,153,0.03)}
+.task.milestone{background:rgba(245,158,11,0.05);border:1px solid rgba(245,158,11,0.15)}
+.cb{width:20px;height:20px;border-radius:5px;border:2px solid rgba(255,255,255,0.15);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.task.done .cb{background:var(--green);border-color:var(--green)}
+.cb svg{display:none;width:11px;height:11px}
+.task.done .cb svg{display:block}
+.task-mid{flex:1;min-width:0}
+.task-name{font-size:12px;line-height:1.4}
+.task-badges{display:flex;gap:4px;margin-top:3px;flex-wrap:wrap;align-items:center}
+.badge{font-size:8px;padding:2px 6px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-weight:600;letter-spacing:0.5px;text-transform:uppercase}
+.badge-project{background:rgba(168,85,247,0.12);color:#C084FC;border:1px solid rgba(168,85,247,0.2)}
+.badge-exam{background:rgba(245,158,11,0.12);color:var(--amber);border:1px solid rgba(245,158,11,0.25)}
+.badge-job{background:rgba(236,72,153,0.1);color:var(--pink);border:1px solid rgba(236,72,153,0.2)}
+.link-btn{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:4px;font-size:9px;font-family:'JetBrains Mono',monospace;text-decoration:none;color:#888;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);transition:all 0.15s;white-space:nowrap;flex-shrink:0}
+.link-btn:hover{color:#fff;background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.2);transform:translateY(-1px)}
+.link-btn svg{width:8px;height:8px}
+.task-actions{display:flex;gap:4px;flex-shrink:0}
+.note-btn{width:24px;height:24px;border-radius:5px;border:1px solid var(--border);background:none;color:var(--text3);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.note-btn:hover{border-color:var(--amber);color:var(--amber)}
+.note-btn.has-note{background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:var(--amber)}
+.done-mark{font-size:9px;color:var(--green);font-family:'JetBrains Mono',monospace;display:none;flex-shrink:0}
+.task.done .done-mark{display:block}
+
+/* ═══ TIMER PANEL ═══ */
+.timer-panel{margin:20px 0;padding:18px;background:linear-gradient(135deg,rgba(34,211,238,0.03),rgba(59,130,246,0.03));border:1px solid rgba(34,211,238,0.12);border-radius:14px}
+.timer-header{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:var(--cyan)}
+.timer-blocks{display:flex;flex-direction:column;gap:10px}
+.timer-block{display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(0,0,0,0.2);border-radius:10px;border:1px solid var(--border);flex-wrap:wrap}
+.timer-block.running{border-color:var(--green);background:rgba(0,230,118,0.04);animation:timerPulse 2s infinite}
+@keyframes timerPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,230,118,0)}50%{box-shadow:0 0 12px 2px rgba(0,230,118,0.1)}}
+.timer-icon{font-size:18px;flex-shrink:0}
+.timer-info{flex:1;min-width:100px}
+.timer-label{font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--text)}
+.timer-sub{font-size:9px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:1px}
+.timer-display{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--text);min-width:95px;text-align:center;letter-spacing:1px}
+.timer-block.running .timer-display{color:var(--green)}
+.timer-btns{display:flex;gap:6px;flex-shrink:0}
+.timer-btn{padding:7px 16px;border-radius:6px;border:none;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.15s;letter-spacing:0.5px;text-transform:uppercase}
+.timer-btn:hover{transform:translateY(-1px)}
+.timer-start{background:var(--green);color:#080b12}
+.timer-stop{background:var(--red);color:#fff}
+.timer-reset{background:rgba(255,255,255,0.06);color:var(--text3);border:1px solid var(--border);font-size:10px;padding:5px 10px}
+.timer-reset:hover{color:var(--text);border-color:var(--border2)}
+.timer-saved{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:2px}
+.timer-totals{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;gap:8px}
+.timer-total-item{text-align:center}
+.timer-total-val{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700}
+.timer-total-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+.timer-total-val.today{color:var(--green)}
+.timer-total-val.week{color:var(--cyan)}
+
+/* ═══ VOCAB ═══ */
+.vocab-section{margin:24px 0;padding:20px;background:linear-gradient(135deg,rgba(34,211,238,0.04) 0%,rgba(168,85,247,0.03) 100%);border:1px solid rgba(34,211,238,0.12);border-radius:14px}
+.vocab-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.vocab-title{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--cyan);display:flex;align-items:center;gap:6px}
+.vocab-day{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.vocab-cards{display:flex;flex-direction:column;gap:8px}
+.vocab-word{padding:10px 14px;background:rgba(0,0,0,0.2);border-radius:8px;border:1px solid var(--border)}
+.vocab-term{font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+.vocab-def{font-size:11px;color:var(--text2);line-height:1.5}
+.vocab-ex{font-size:10px;color:var(--text3);font-style:italic;margin-top:3px}
+
+/* ═══ ENGLISH RESOURCES ═══ */
+.eng-resources{margin:20px 0;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px}
+.eng-resources h3{font-family:'Sora',sans-serif;font-size:13px;font-weight:700;margin-bottom:10px;color:var(--cyan)}
+.eng-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px}
+.eng-link{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;text-decoration:none;background:rgba(255,255,255,0.02);border:1px solid var(--border);transition:all 0.15s;font-size:11px;color:var(--text2)}
+.eng-link:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-1px)}
+.eng-link span{font-size:13px}
+
+/* ═══ WEEK COMPLETE ═══ */
+.week-complete{padding:18px;text-align:center;background:linear-gradient(135deg,rgba(0,230,118,0.08),rgba(0,230,118,0.02));border:1px solid rgba(0,230,118,0.2);border-radius:12px;margin:16px 0;display:none}
+.week-complete.show{display:block}
+.week-complete-text{font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--green)}
+
+/* ═══ JOB TRACKER ═══ */
+#jobView{display:none}
+
+.job-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.job-stat-card{padding:16px 12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;text-align:center;transition:all 0.2s}
+.job-stat-card:hover{transform:translateY(-2px);border-color:var(--border2)}
+.job-stat-val{font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:800;margin-bottom:4px}
+.job-stat-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px}
+.jsc-total .job-stat-val{color:var(--blue)}
+.jsc-int .job-stat-val{color:var(--purple)}
+.jsc-rej .job-stat-val{color:var(--red)}
+.jsc-offer .job-stat-val{color:var(--green)}
+
+.job-add-panel{padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:20px}
+.job-add-panel h3{font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:var(--amber);margin-bottom:12px}
+.job-form-grid{display:grid;grid-template-columns:1fr 1fr 1.2fr auto;gap:8px;align-items:end}
+.form-field{display:flex;flex-direction:column;gap:4px}
+.form-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace}
+.form-inp{background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:8px 10px;font-family:'Outfit',sans-serif;font-size:12px;width:100%;transition:border-color 0.15s}
+.form-inp:focus{outline:none;border-color:var(--amber)}
+.add-btn{padding:0 18px;height:36px;border-radius:7px;background:var(--amber);color:#000;border:none;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s}
+.add-btn:hover{opacity:0.88;transform:translateY(-1px)}
+
+.job-table-wrap{border-radius:12px;border:1px solid var(--border);overflow:hidden;overflow-x:auto}
+.job-tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:600px}
+.job-tbl th{padding:10px 12px;text-align:left;font-size:9px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);background:var(--bg3);border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;transition:color 0.15s}
+.job-tbl th:hover{color:var(--text)}
+.job-tbl th.active-sort{color:var(--amber)}
+.job-tbl th.no-sort{cursor:default}
+.job-tbl th.no-sort:hover{color:var(--text3)}
+.sort-arrow{margin-left:4px;font-size:9px;color:var(--amber)}
+.job-tbl td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.job-tbl tr:last-child td{border-bottom:none}
+.job-tbl tr:hover td{background:var(--surface)}
+.job-portal-link{color:var(--cyan);text-decoration:none;display:inline-flex;align-items:center;gap:3px;font-size:11px;transition:all 0.15s}
+.job-portal-link:hover{color:#fff;text-decoration:underline}
+.job-portal-link svg{flex-shrink:0}
+.status-sel{border-radius:5px;font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:600;cursor:pointer;padding:3px 7px;border:1px solid;transition:all 0.15s;appearance:none;-webkit-appearance:none;text-align:center}
+.status-sel:focus{outline:none}
+.status-sel.Applied{background:rgba(59,130,246,0.12);color:var(--blue);border-color:rgba(59,130,246,0.3)}
+.status-sel.In-Progress{background:rgba(245,158,11,0.12);color:var(--amber);border-color:rgba(245,158,11,0.3)}
+.status-sel.Assessment-Centre{background:rgba(168,85,247,0.12);color:var(--purple);border-color:rgba(168,85,247,0.3)}
+.status-sel.Interview{background:rgba(34,211,238,0.12);color:var(--cyan);border-color:rgba(34,211,238,0.3)}
+.status-sel.Offer{background:rgba(0,230,118,0.12);color:var(--green);border-color:rgba(0,230,118,0.3)}
+.status-sel.Rejected{background:rgba(239,68,68,0.1);color:var(--red);border-color:rgba(239,68,68,0.3)}
+.status-sel option{background:var(--bg3);color:var(--text);font-weight:400}
+.del-job-btn{width:24px;height:24px;border-radius:5px;border:1px solid var(--border);background:none;color:var(--text3);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.del-job-btn:hover{border-color:var(--red);color:var(--red);background:rgba(239,68,68,0.08)}
+.job-empty-state{padding:40px 20px;text-align:center;color:var(--text3)}
+.job-empty-state .jem-icon{font-size:36px;margin-bottom:10px}
+.job-empty-state .jem-text{font-size:13px}
+
+/* ═══ FILE ATTACHMENT ═══ */
+.attach-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:5px;border:1px dashed rgba(255,255,255,0.15);background:none;color:var(--text3);cursor:pointer;font-size:10px;font-family:'JetBrains Mono',monospace;transition:all 0.15s;white-space:nowrap}
+.attach-btn:hover{border-color:var(--purple);color:var(--purple);background:rgba(168,85,247,0.06)}
+.file-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:5px;background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.25);max-width:160px}
+.file-chip-name{font-size:9px;font-family:'JetBrains Mono',monospace;color:#C084FC;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90px;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.file-chip-name:hover{color:#fff}
+.file-chip-del{width:14px;height:14px;border-radius:3px;border:none;background:none;color:rgba(192,132,252,0.5);cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;padding:0;transition:color 0.15s;flex-shrink:0}
+.file-chip-del:hover{color:var(--red)}
+
+/* ═══ NOTES MODAL ═══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.show{display:flex}
+.modal{background:var(--bg3);border:1px solid var(--border2);border-radius:14px;padding:24px;width:100%;max-width:500px}
+.modal h3{font-family:'Sora',sans-serif;font-size:15px;margin-bottom:12px;color:var(--amber)}
+.modal textarea{width:100%;height:120px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:12px;font-family:'Outfit',sans-serif;font-size:13px;resize:vertical}
+.modal textarea:focus{outline:none;border-color:var(--amber)}
+.modal-btns{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+.modal-btn{padding:8px 18px;border-radius:6px;border:none;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s}
+.modal-save{background:var(--amber);color:#000}
+.modal-save:hover{transform:translateY(-1px)}
+.modal-cancel{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+
+/* ═══ FOOTER ═══ */
+.footer{margin-top:24px;padding:14px;background:var(--surface);border-radius:10px;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.footer span{font-size:11px;color:var(--text3)}
+.reset-btn{font-size:10px;color:var(--red);cursor:pointer;opacity:0.5;text-decoration:underline;background:none;border:none;font-family:inherit}
+.reset-btn:hover{opacity:1}
+
+/* ═══ MOBILE ═══ */
+@media(max-width:680px){
+  .stats-bar{padding:7px 10px}
+  .stat-card{padding:4px 7px}
+  .stat-val{font-size:11px}
+  .stat-label{font-size:8px}
+  .stat-timer{min-width:155px;padding:4px 8px;gap:5px}
+  .st-display{font-size:13px;min-width:62px}
+  .container{padding:12px 12px 40px}
+  .phases{gap:5px}
+  .phase-card{min-width:110px}
+  .job-stats-grid{grid-template-columns:repeat(2,1fr)}
+  .job-form-grid{grid-template-columns:1fr 1fr}
+  .cal-widget{right:8px;width:270px;top:110px}
+  .view-tab{font-size:12px;padding:10px 6px}
+  .header h1{font-size:22px}
+  .header-sub{font-size:12px}
+}
+@media(max-width:420px){
+  .stat-card{padding:3px 6px}
+  .stat-label{display:none}
+  .job-form-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- TWO-ROW STATS BAR                             -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="stats-bar">
+  <!-- ROW 1 — Study + Timer -->
+  <div class="stats-row stats-row-1">
+    <div class="stat-card stat-day"><span class="stat-icon">📅</span><div><div class="stat-val" id="dayCount">Day 1</div><div class="stat-label">Journey</div></div></div>
+    <div class="stat-card stat-countdown"><span class="stat-icon">⏳</span><div><div class="stat-val" id="countdown">--</div><div class="stat-label">→ FMVA</div></div></div>
+    <div class="stat-card stat-hours"><span class="stat-icon">⏱️</span><div><div class="stat-val" id="totalHours">0h</div><div class="stat-label">Logged</div></div></div>
+    <div class="stat-card stat-progress"><span class="stat-icon">📊</span><div><div class="stat-val" id="totalPct">0%</div><div class="stat-label">Study %</div></div></div>
+    <div class="stat-timer" id="statTimer">
+      <div class="st-display" id="stDisplay">00:00:00</div>
+      <div class="st-block-name" id="stBlockName">Not running</div>
+      <div class="st-buttons">
+        <button class="st-btn st-start" id="stStartBtn" onclick="openTimerMenu()" title="Start timer">▶</button>
+        <button class="st-btn st-stop" id="stStopBtn" onclick="stopActiveTimer()" title="Stop" style="display:none">⏹</button>
+      </div>
+      <div class="st-menu" id="stMenu">
+        <div class="st-menu-item" onclick="startTimer('m')">☀️ Morning Block</div>
+        <div class="st-menu-item" onclick="startTimer('e')">🌙 Evening Block</div>
+        <div class="st-menu-item" onclick="startTimer('en')">📚 English Hour</div>
+      </div>
+    </div>
+    <button class="cal-btn" id="calBtn" onclick="toggleCalendar()" title="Monthly gym calendar">📅</button>
+    <div class="quote-bar" id="quoteBar"></div>
+  </div>
+  <!-- ROW 2 — Gym + Jobs + Learning -->
+  <div class="stats-row">
+    <div class="stat-card stat-gym"><span class="stat-icon">🏋️</span><div><div class="stat-val" id="gymStreak">0🔥</div><div class="stat-label">Gym Streak</div></div></div>
+    <div class="stat-card stat-gym-pct"><span class="stat-icon">📆</span><div><div class="stat-val" id="gymPct">0%</div><div class="stat-label">Gym/Month</div></div></div>
+    <div class="stat-card stat-jobs"><span class="stat-icon">📨</span><div><div class="stat-val" id="statAppCount">0</div><div class="stat-label">Applied</div></div></div>
+    <div class="stat-card stat-interviews"><span class="stat-icon">🤝</span><div><div class="stat-val" id="statIntCount">0</div><div class="stat-label">Interviews</div></div></div>
+    <div class="stat-card" style="cursor:pointer;border-color:rgba(168,85,247,0.3)" onclick="toggleLearningHub('certificates')"><span class="stat-icon">🏅</span><div><div class="stat-val" style="color:var(--purple)" id="statCerts">0</div><div class="stat-label">Certs</div></div></div>
+    <div class="stat-card" style="cursor:pointer;border-color:rgba(236,72,153,0.3)" onclick="toggleLearningHub('skills')"><span class="stat-icon">🎯</span><div><div class="stat-val" style="color:var(--pink)" id="statSkills">0</div><div class="stat-label">You've learned</div></div></div>
+    <div class="stat-card" style="cursor:pointer;border-color:rgba(255,107,43,0.3)" onclick="toggleLearningHub('streak')"><span class="stat-icon">🔥</span><div><div class="stat-val" style="color:var(--fire)" id="statStreak">0🔥</div><div class="stat-label">Streak</div></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- CALENDAR WIDGET                                -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="cal-widget" id="calWidget">
+  <div class="cal-widget-hdr">
+    <div class="cal-month-title" id="calMonthTitle">April 2026</div>
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="navCalMonth(-1)">◀</button>
+      <button class="cal-nav-btn" onclick="navCalMonth(1)">▶</button>
+    </div>
+  </div>
+  <div class="cal-stats-row">
+    <div class="cal-stat-box"><div class="cal-stat-val" id="calStreakVal">0</div><div class="cal-stat-lbl">🔥 Gym Streak</div></div>
+    <div class="cal-stat-box"><div class="cal-stat-val pct" id="calPctVal">0%</div><div class="cal-stat-lbl">📆 This Month</div></div>
+  </div>
+  <div class="cal-grid" id="calGrid"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- MAIN CONTAINER                                  -->
+<!-- ═══════════════════════════════════════════════ -->
+<!-- LEARNING HUB MODAL -->
+<div class="learning-hub" id="learningHub" data-active-tab=""></div>
+
+<div class="container">
+  <div class="header">
+    <div class="header-tag">🇬🇧 Mission Control · Finance Career</div>
+    <h1>YOUR FINANCE LAUNCHPAD</h1>
+    <div class="header-sub">14 weeks · FMVA · Excel · 4 Projects · English · UK Job Hunt</div>
+  </div>
+
+  <!-- MAIN VIEW TABS -->
+  <div class="view-tabs">
+    <div class="view-tab active" id="tabStudy" onclick="switchView('study')">📚 Study Plan</div>
+    <div class="view-tab" id="tabJobs" onclick="switchView('jobs')">💼 Job Tracker</div>
+  </div>
+
+  <!-- ═══ STUDY VIEW ═══ -->
+  <div id="studyView">
+    <div class="overall">
+      <div class="overall-top">
+        <div class="overall-label">Mission Progress: <strong id="doneCount">0</strong> / <strong id="totalCount">0</strong> tasks</div>
+        <div class="overall-pct" id="overallPct">0%</div>
+      </div>
+      <div class="overall-bar"><div class="overall-bar-fill" id="overallBar" style="width:0%"></div></div>
+    </div>
+    <div class="phases" id="phases"></div>
+    <div class="week-nav">
+      <button class="week-nav-btn" id="prevWeek" onclick="navWeek(-1)">◀</button>
+      <div class="week-info">
+        <div class="week-number" id="weekNum"></div>
+        <div class="week-title" id="weekTitle"></div>
+        <div class="week-dates" id="weekDates"></div>
+        <div class="week-intensity" id="weekIntensity"></div>
+      </div>
+      <button class="week-nav-btn" id="nextWeek" onclick="navWeek(1)">▶</button>
+    </div>
+    <div id="weekContent"></div>
+    <div class="vocab-section" id="vocabSection"></div>
+    <div class="eng-resources">
+      <h3>📚 Free English Resources</h3>
+      <div class="eng-links">
+        <a class="eng-link" href="https://www.bbc.co.uk/learningenglish" target="_blank"><span>🇬🇧</span> BBC Learning English</a>
+        <a class="eng-link" href="https://www.engvid.com" target="_blank"><span>🎥</span> EngVid</a>
+        <a class="eng-link" href="https://www.vocabulary.com" target="_blank"><span>📖</span> Vocabulary.com</a>
+        <a class="eng-link" href="https://writeandimprove.com" target="_blank"><span>✍️</span> Write &amp; Improve</a>
+        <a class="eng-link" href="https://www.elsa.ai" target="_blank"><span>🗣️</span> ELSA Speak</a>
+        <a class="eng-link" href="https://www.ted.com/talks" target="_blank"><span>💡</span> TED Talks</a>
+        <a class="eng-link" href="https://quizlet.com" target="_blank"><span>🃏</span> Quizlet</a>
+        <a class="eng-link" href="https://www.ft.com" target="_blank"><span>📰</span> FT</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ JOB TRACKER VIEW ═══ -->
+  <div id="jobView">
+    <div class="job-stats-grid">
+      <div class="job-stat-card jsc-total"><div class="job-stat-val" id="jTotal">0</div><div class="job-stat-label">📨 Total Applied</div></div>
+      <div class="job-stat-card jsc-int"><div class="job-stat-val" id="jInterviews">0</div><div class="job-stat-label">🤝 Interviews</div></div>
+      <div class="job-stat-card jsc-rej"><div class="job-stat-val" id="jRejected">0</div><div class="job-stat-label">❌ Rejected</div></div>
+      <div class="job-stat-card jsc-offer"><div class="job-stat-val" id="jOffers">0</div><div class="job-stat-label">🎉 Offers</div></div>
+    </div>
+    <div class="job-add-panel">
+      <h3>➕ Log New Application</h3>
+      <div class="job-form-grid">
+        <div class="form-field"><div class="form-lbl">Company</div><input class="form-inp" id="jCompany" placeholder="e.g. PwC" /></div>
+        <div class="form-field"><div class="form-lbl">Position</div><input class="form-inp" id="jPosition" placeholder="e.g. Finance Analyst" /></div>
+        <div class="form-field"><div class="form-lbl">Job Portal Link</div><input class="form-inp" id="jLink" placeholder="https://..." /></div>
+        <button class="add-btn" onclick="addJob()">+ Add</button>
+      </div>
+    </div>
+    <!-- Hidden file input for attachments -->
+    <input type="file" id="filePickerInput" style="display:none" accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg" onchange="handleFilePicked(event)">
+
+    <div class="job-table-wrap">
+      <table class="job-tbl" id="jobTable">
+        <thead>
+          <tr>
+            <th class="no-sort" style="width:36px">#</th>
+            <th onclick="sortJobs('company')" id="th_company">Company</th>
+            <th onclick="sortJobs('position')" id="th_position">Position</th>
+            <th class="no-sort">Portal</th>
+            <th onclick="sortJobs('status')" id="th_status">Status</th>
+            <th onclick="sortJobs('date')" id="th_date">Date</th>
+            <th class="no-sort" style="min-width:130px">📎 File</th>
+            <th class="no-sort" style="width:36px"></th>
+          </tr>
+        </thead>
+        <tbody id="jobTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>✓ Progress saved permanently · Click tasks to complete · Links open in new tab</span>
+    <button class="reset-btn" onclick="if(confirm('Reset ALL progress, notes, timers and job data?')){localStorage.removeItem('mctState');location.reload()}">Reset everything</button>
+  </div>
+</div>
+
+<!-- NOTES MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3 id="modalTitle">Task Notes</h3>
+    <textarea id="modalText" placeholder="Write your notes here..."></textarea>
+    <div class="modal-btns">
+      <button class="modal-btn modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn modal-save" onclick="saveNote()">Save Note</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// LINKS DATA
+// ══════════════════════════════════════════════════════════
+const L={
+  ac_debits:"https://www.accountingcoach.com/debits-and-credits/explanation",
+  ac_journal:"https://www.accountingcoach.com/journal-entries/explanation",
+  ac_balance:"https://www.accountingcoach.com/balance-sheet/explanation",
+  ac_income:"https://www.accountingcoach.com/income-statement/explanation",
+  ac_cashflow:"https://www.accountingcoach.com/cash-flow-statement/explanation",
+  ac_ratios:"https://www.accountingcoach.com/financial-ratios/explanation",
+  khan_bs:"https://www.khanacademy.org/economics-finance-domain/core-finance/accounting-and-financial-stateme/balance-sheet-tutorial/v/introduction-to-balance-sheet",
+  khan_is:"https://www.khanacademy.org/economics-finance-domain/core-finance/accounting-and-financial-stateme/income-statement-tutorial/v/income-statement-introduction",
+  khan_cf:"https://www.khanacademy.org/economics-finance-domain/core-finance/accounting-and-financial-stateme/cash-flow-tutorial/v/cash-accounting",
+  cfi_free:"https://corporatefinanceinstitute.com/course/learn-accounting-fundamentals-corporate-finance/",
+  cfi_fmva:"https://corporatefinanceinstitute.com/certifications/fmva/",
+  cfi_xl:"https://corporatefinanceinstitute.com/course/excel-fundamentals-formulas-for-finance/",
+  cfi_3s:"https://corporatefinanceinstitute.com/course/3-statement-financial-modeling/",
+  cfi_dcf:"https://corporatefinanceinstitute.com/course/dcf-valuation-modeling/",
+  cfi_bud:"https://corporatefinanceinstitute.com/course/budgeting-and-forecasting/",
+  mos:"https://learn.microsoft.com/en-us/credentials/certifications/mos-excel-expert-2019/",
+  pbi:"https://learn.microsoft.com/en-us/training/paths/create-use-analytics-reports-power-bi/",
+  acca:"https://www.accaglobal.com/gb/en.html",
+  acca_ma:"https://www.accaglobal.com/gb/en/student/exam-support-resources/foundation-level-study-resources/acca-ma.html",
+  acca_fa:"https://www.accaglobal.com/gb/en/student/exam-support-resources/foundation-level-study-resources/acca-fa.html",
+  yf:"https://finance.yahoo.com",mt:"https://www.macrotrends.net",
+  dam:"https://pages.stern.nyu.edu/~adamodar/",
+  inv_dcf:"https://www.investopedia.com/terms/d/dcf.asp",
+  inv_var:"https://www.investopedia.com/terms/v/var.asp",
+  pd:"https://pandas.pydata.org/docs/getting_started/index.html",
+  np:"https://numpy.org/doc/stable/user/quickstart.html",
+  li:"https://www.linkedin.com",
+  gc:"https://www.gradcracker.com",rmp:"https://www.ratemyplacement.co.uk",
+};
+
+const ARROW='<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="9" height="9"><path d="M3 9L9 3M9 3H5M9 3V7"/></svg>';
+
+// ══════════════════════════════════════════════════════════
+// PHASES
+// ══════════════════════════════════════════════════════════
+const PHASES=[
+  {id:"ramp",name:"Ramp-Up",emoji:"🚀",color:"#F59E0B",weeks:[0,1]},
+  {id:"fmva",name:"FMVA + Projects",emoji:"📊",color:"#3B82F6",weeks:[2,3,4,5,6,7,8,9]},
+  {id:"pbi",name:"Power BI + Dashboard",emoji:"📉",color:"#10B981",weeks:[10,11]},
+  {id:"python",name:"Python Project",emoji:"🐍",color:"#A855F7",weeks:[12,13]},
+  {id:"jobs",name:"Job Hunt",emoji:"🇬🇧",color:"#EF4444",weeks:[14]},
+  {id:"acca",name:"ACCA (Bonus)",emoji:"📘",color:"#EC4899",weeks:[15]},
+];
+
+// ══════════════════════════════════════════════════════════
+// TASK HELPER
+// ══════════════════════════════════════════════════════════
+function T(task,time,type,links,flags){return{task,time,type:type||"learn",links:links||[],flags:flags||[]}}
+
+// ══════════════════════════════════════════════════════════
+// WEEKS DATA
+// ══════════════════════════════════════════════════════════
+const WEEKS=[
+{w:0,title:"Building the Foundation",dates:"Mar 16–20",intensity:"3.5 hrs/day · Ramp-up",sched:{m:"9:00–10:30",e:"3:30–5:00",en:"5:00–5:30"},days:[
+[T("AccountingCoach: Introduction to Accounting","9:00–10:30","learn",[{u:L.ac_debits,l:"AccountingCoach"}]),T("AccountingCoach: Debits & Credits exercises","3:30–5:00","learn",[{u:L.ac_debits,l:"AccountingCoach"}]),T("English: Take free level test + set weekly goals","5:00–5:30","english")],
+[T("AccountingCoach: Journal Entries explanation","9:00–10:30","learn",[{u:L.ac_journal,l:"AccountingCoach"}]),T("AccountingCoach: 20 Journal Entry practice problems","3:30–5:00","learn",[{u:L.ac_journal,l:"AccountingCoach"}]),T("English: BBC Learning English — 6 Minute English","5:00–5:30","english")],
+[T("AccountingCoach: The Balance Sheet","9:00–10:30","learn",[{u:L.ac_balance,l:"AccountingCoach"}]),T("Khan Academy: Balance Sheet videos","3:30–5:00","learn",[{u:L.khan_bs,l:"Khan Academy"}]),T("English: Learn 10 finance vocabulary words","5:00–5:30","english")],
+[T("Build a Balance Sheet in Excel from scratch","9:00–10:30","excel"),T("AccountingCoach: Income Statement (P&L)","3:30–5:00","learn",[{u:L.ac_income,l:"AccountingCoach"}]),T("English: EngVid — Business English lesson","5:00–5:30","english")],
+[T("Khan Academy: Income Statement videos","9:00–10:30","learn",[{u:L.khan_is,l:"Khan Academy"}]),T("Build a P&L in Excel from scratch","3:30–5:00","excel"),T("English: Write a paragraph about your week","5:00–5:30","english")],
+]},
+{w:1,title:"Financial Statements Deep Dive",dates:"Mar 23–27",intensity:"3.5 hrs/day · Ramp-up",sched:{m:"9:00–10:30",e:"3:30–5:00",en:"5:00–5:30"},days:[
+[T("AccountingCoach: Cash Flow Statement","9:00–10:30","learn",[{u:L.ac_cashflow,l:"AccountingCoach"}]),T("Khan Academy: Cash Flow videos","3:30–5:00","learn",[{u:L.khan_cf,l:"Khan Academy"}]),T("English: BBC — English at Work series","5:00–5:30","english")],
+[T("Build a basic Cash Flow Statement in Excel","9:00–10:30","excel"),T("CFI Free: How the 3 statements connect","3:30–5:00","learn",[{u:L.cfi_free,l:"CFI Course"}]),T("English: Learn 10 new business words","5:00–5:30","english")],
+[T("Draw the 3-statement linkage from memory","9:00–10:30","learn"),T("CFI Free Course: remaining modules","3:30–5:00","learn",[{u:L.cfi_free,l:"CFI Course"}]),T("English: ELSA Speak — pronunciation practice","5:00–5:30","english")],
+[T("Read a real UK company annual report","9:00–10:30","learn",[{u:L.mt,l:"Macrotrends"}]),T("Write a 1-page summary of the company finances","3:30–5:00","learn"),T("English: TED Talk — finance topic + notes","5:00–5:30","english")],
+[T("AccountingCoach: Financial Ratios","9:00–10:30","learn",[{u:L.ac_ratios,l:"AccountingCoach"}]),T("Calculate 6 ratios on the real company + flashcards","3:30–5:00","learn"),T("English: Write & Improve — essay practice","5:00–5:30","english")],
+]},
+{w:2,title:"Excel Mastery + FMVA Launch",dates:"Mar 30 – Apr 3",intensity:"5→6.5 hrs/day · Transition week",sched:{m:"9:00–11:30",e:"3:30–6:30",en:"6:30–7:30"},days:[
+[T("Excel: Build linked 3-statement model from scratch","9:00–11:30","excel"),T("Study top 20 UK finance interview questions","3:30–5:00","learn"),T("Record yourself: 'Walk me through the 3 statements'","5:00–6:30","learn"),T("English: BBC 6 Min English + vocab review","6:30–7:30","english")],
+[T("Set up CFI account + preview FMVA Module 1","9:00–11:30","fmva",[{u:L.cfi_fmva,l:"CFI FMVA"}]),T("FMVA: Excel Crash Course Part 1 — shortcuts, basics","3:30–6:30","fmva",[{u:L.cfi_xl,l:"CFI Excel"}]),T("English: EngVid lesson + new vocab","6:30–7:30","english")],
+[T("FMVA: Excel — VLOOKUP, INDEX-MATCH","9:00–11:30","fmva",[{u:L.cfi_xl,l:"CFI Excel"}]),T("FMVA: Excel — IF, SUMIF, nested formulas","3:30–6:30","fmva",[{u:L.cfi_xl,l:"CFI Excel"}]),T("English: Write professional email practice","6:30–7:30","english")],
+[T("FMVA: Excel — PivotTables & charts","9:00–11:30","fmva",[{u:L.cfi_xl,l:"CFI Excel"}]),T("FMVA: Excel — advanced formulas practice","3:30–6:30","fmva",[{u:L.cfi_xl,l:"CFI Excel"}]),T("English: ELSA Speak + finance pronunciation","6:30–7:30","english")],
+[T("FMVA: Excel — Dashboard building & formatting","9:00–11:30","fmva",[{u:L.cfi_xl,l:"CFI Excel"}]),T("MOS Excel Expert: Overview + study plan","3:30–6:30","excel",[{u:L.mos,l:"Microsoft Learn"}]),T("English: TED Talk + write summary","6:30–7:30","english")],
+]},
+{w:3,title:"FMVA Financial Statements",dates:"Apr 6–10",intensity:"6.5 hrs/day · Full",sched:{m:"9:00–11:30",e:"3:30–6:30",en:"6:30–7:30"},days:[
+[T("FMVA: Reading Financial Statements — Part 1","9:00–11:30","fmva",[{u:L.cfi_fmva,l:"CFI FMVA"}]),T("FMVA: Reading Financial Statements — Part 2","3:30–5:30","fmva",[{u:L.cfi_fmva,l:"CFI FMVA"}]),T("MOS Excel: Practice tests","5:30–6:30","excel",[{u:L.mos,l:"MOS Prep"}]),T("English: BBC + 10 new vocab words","6:30–7:30","english")],
+[T("FMVA: Analyse a real company filing","9:00–11:30","fmva",[{u:L.yf,l:"Yahoo Finance"}]),T("FMVA: Financial Statements review + quiz","3:30–5:30","fmva",[{u:L.cfi_fmva,l:"CFI FMVA"}]),T("MOS Excel: Practice tests","5:30–6:30","excel",[{u:L.mos,l:"MOS Prep"}]),T("English: Write & Improve essay","6:30–7:30","english")],
+[T("MOS Excel: Full mock exam practice","9:00–11:30","excel",[{u:L.mos,l:"MOS Prep"}]),T("MOS Excel: Review weak areas","3:30–5:00","excel",[{u:L.mos,l:"MOS Prep"}]),T("🏅 MOS Excel Expert — SIT & PASS","5:00–6:30","milestone",[{u:L.mos,l:"MOS Exam"}],["exam"]),T("English: EngVid business lesson","6:30–7:30","english")],
+[T("FMVA: 3-Statement Model — Income Statement build","9:00–11:30","fmva",[{u:L.cfi_3s,l:"CFI 3-Stmt"}]),T("FMVA: 3-Statement Model — Balance Sheet build","3:30–6:30","fmva",[{u:L.cfi_3s,l:"CFI 3-Stmt"}]),T("English: TED Talk + vocab","6:30–7:30","english")],
+[T("FMVA: 3-Statement Model — Cash Flow build","9:00–11:30","fmva",[{u:L.cfi_3s,l:"CFI 3-Stmt"}]),T("FMVA: 3-Statement Model — Linking & balancing","3:30–6:30","fmva",[{u:L.cfi_3s,l:"CFI 3-Stmt"}]),T("English: ELSA Speak + review week's vocab","6:30–7:30","english")],
+]},
+{w:4,title:"3-Statement Mastery + DCF Begins",dates:"Apr 13–17",intensity:"6.5 hrs/day · Full",sched:{m:"9:00–11:30",e:"3:30–6:30",en:"6:30–7:30"},days:[
+[T("FMVA: 3-Statement Model — Part 2 deep dive","9:00–11:30","fmva",[{u:L.cfi_3s,l:"CFI 3-Stmt"}]),T("FMVA: 3-Statement review + practice from scratch","3:30–6:30","fmva",[{u:L.cfi_3s,l:"CFI 3-Stmt"}]),T("English: BBC + professional email writing","6:30–7:30","english")],
+[T("FMVA: DCF Valuation — Part 1 theory","9:00–11:30","fmva",[{u:L.cfi_dcf,l:"CFI DCF"}]),T("FMVA: DCF Valuation — free cash flow build","3:30–6:30","fmva",[{u:L.cfi_dcf,l:"CFI DCF"}]),T("English: EngVid + 10 new words","6:30–7:30","english")],
+[T("FMVA: DCF — WACC calculation","9:00–11:30","fmva",[{u:L.cfi_dcf,l:"CFI DCF"}]),T("FMVA: DCF — terminal value + model complete","3:30–6:30","fmva",[{u:L.cfi_dcf,l:"CFI DCF"}]),T("English: Write & Improve + vocab review","6:30–7:30","english")],
+[T("FMVA: DCF — Sensitivity analysis & outputs","9:00–11:30","fmva",[{u:L.cfi_dcf,l:"CFI DCF"}]),T("🔨 PROJECT: Pick FTSE 100 company for DCF","3:30–6:30","project",[{u:L.yf,l:"Yahoo Finance"},{u:L.mt,l:"Macrotrends"}],["project"]),T("English: TED Talk on finance + notes","6:30–7:30","english")],
+[T("🔨 PROJECT: Gather 5yr financials, build forecast","9:00–11:30","project",[{u:L.dam,l:"Damodaran"}],["project"]),T("🔨 PROJECT: Calculate WACC, build DCF in Excel","3:30–6:30","project",[{u:L.inv_dcf,l:"Investopedia DCF"}],["project"]),T("English: ELSA Speak + week review","6:30–7:30","english")],
+]},
+{w:5,title:"DCF Project + Budgeting",dates:"Apr 20–24",intensity:"6.5 hrs/day · Full",sched:{m:"9:00–11:30",e:"3:30–6:30",en:"6:30–7:30"},days:[
+[T("🔨 PROJECT: DCF sensitivity tables & football field","9:00–11:30","project",[],["project"]),T("🔨 PROJECT: Write DCF report → GitHub + portfolio","3:30–6:30","project",[{u:L.li,l:"LinkedIn"}],["project"]),T("English: BBC Business English + vocab","6:30–7:30","english")],
+[T("FMVA: Budgeting & Forecasting — Part 1","9:00–11:30","fmva",[{u:L.cfi_bud,l:"CFI Budget"}]),T("FMVA: Budgeting & Forecasting — Part 2","3:30–6:30","fmva",[{u:L.cfi_bud,l:"CFI Budget"}]),T("English: EngVid + new vocab set","6:30–7:30","english")],
+[T("FMVA: FP&A skills — variance analysis","9:00–11:30","fmva",[{u:L.cfi_fmva,l:"CFI FMVA"}]),T("🔨 PROJECT: Pick UK company for Equity Research","3:30–6:30","project",[{u:L.yf,l:"Yahoo Finance"}],["project"]),T("English: Write & Improve + financial writing","6:30–7:30","english")],
+[T("🔨 PROJECT: Industry overview + competitive positioning","9:00–11:30","project",[],["project"]),T("🔨 PROJECT: Financial analysis + DCF & comparables","3:30–6:30","project",[{u:L.dam,l:"Damodaran"}],["project"]),T("English: TED Talk + summary writing","6:30–7:30","english")],
+[T("🔨 PROJECT: Buy/Hold/Sell recommendation + publish","9:00–11:30","project",[{u:L.li,l:"LinkedIn"}],["project"]),T("FMVA: Review all modules — prep for final exam","3:30–6:30","fmva",[{u:L.cfi_fmva,l:"CFI FMVA"}]),T("English: ELSA + full week vocab review","6:30–7:30","english")],
+]},
+{w:6,title:"🏅 FMVA EXAM WEEK",dates:"Apr 27 – May 1",intensity:"6.5 hrs/day · EXAM WEEK 🔥",sched:{m:"9:00–11:30",e:"3:30–6:30",en:"6:30–7:30"},days:[
+[T("FMVA: Final revision — 3-Statement Model","9:00–11:30","fmva",[{u:L.cfi_fmva,l:"CFI FMVA"}]),T("FMVA: Final revision — DCF & Budgeting","3:30–6:30","fmva",[{u:L.cfi_fmva,l:"CFI FMVA"}]),T("English: vocab + calm reading","6:30–7:30","english")],
+[T("FMVA: Practice exam questions + weak areas","9:00–11:30","fmva",[{u:L.cfi_fmva,l:"CFI FMVA"}]),T("FMVA: Full mock exam attempt","3:30–6:30","fmva",[{u:L.cfi_fmva,l:"CFI FMVA"}]),T("English: Business writing practice","6:30–7:30","english")],
+[T("🏅 FMVA FINAL EXAM — SIT & PASS","9:00–12:00","milestone",[{u:L.cfi_fmva,l:"CFI FMVA"}],["exam"]),T("Add FMVA to CV & LinkedIn immediately","3:30–5:00","job",[{u:L.li,l:"LinkedIn"}]),T("Update portfolio site with FMVA cert","5:00–6:30","job"),T("English: Celebration + vocab","6:30–7:30","english")],
+[T("Build UK-format 1-page CV (ATS-friendly)","9:00–11:30","job"),T("Overhaul LinkedIn: headline, about, featured","3:30–6:30","job",[{u:L.li,l:"LinkedIn"}]),T("English: CV writing in English practice","6:30–7:30","english")],
+[T("Set up Gradcracker & RateMyPlacement profiles","9:00–11:30","job",[{u:L.gc,l:"Gradcracker"},{u:L.rmp,l:"RateMyPlacement"}]),T("Apply to first 5 UK finance roles","3:30–6:30","job"),T("English: Mock interview answers practice","6:30–7:30","english")],
+]},
+{w:7,title:"Power BI + Job Applications",dates:"May 4–8",intensity:"6.5 hrs/day + applying",sched:{m:"9:00–11:30",e:"3:30–6:30",en:"6:30–7:30"},days:[
+[T("Microsoft Learn: Power BI for Finance — Part 1","9:00–11:30","learn",[{u:L.pbi,l:"Power BI Path"}]),T("Microsoft Learn: Power BI — Part 2","3:30–5:30","learn",[{u:L.pbi,l:"Power BI Path"}]),T("Apply to 3 UK roles","5:30–6:30","job"),T("English: BBC + vocab","6:30–7:30","english")],
+[T("Microsoft Learn: Power BI — Part 3","9:00–11:30","learn",[{u:L.pbi,l:"Power BI Path"}]),T("Power BI: Practice with sample finance data","3:30–5:30","learn",[{u:L.pbi,l:"Power BI Path"}]),T("Apply to 3 UK roles","5:30–6:30","job"),T("English: EngVid + new words","6:30–7:30","english")],
+[T("🔨 PROJECT: Select 10 FTSE 250 companies","9:00–11:30","project",[{u:L.yf,l:"Yahoo Finance"},{u:L.mt,l:"Macrotrends"}],["project"]),T("🔨 PROJECT: Calculate all ratios in Excel","3:30–6:30","project",[],["project"]),T("English: Write & Improve","6:30–7:30","english")],
+[T("🔨 PROJECT: Build Power BI dashboard — Part 1","9:00–11:30","project",[{u:L.pbi,l:"Power BI Docs"}],["project"]),T("🔨 PROJECT: Build Power BI dashboard — Part 2","3:30–6:30","project",[],["project"]),T("English: TED Talk + summary","6:30–7:30","english")],
+[T("🔨 PROJECT: Polish + publish dashboard → GitHub + LinkedIn","9:00–11:30","project",[{u:L.li,l:"LinkedIn"}],["project"]),T("Apply to 5 UK roles + follow up previous","3:30–6:30","job"),T("English: ELSA + week review","6:30–7:30","english")],
+]},
+{w:8,title:"Python Setup + Risk Project",dates:"May 11–15",intensity:"6.5 hrs/day + applying",sched:{m:"9:00–11:30",e:"3:30–6:30",en:"6:30–7:30"},days:[
+[T("Set up Python: install Pandas, NumPy, Matplotlib","9:00–11:30","learn",[{u:L.pd,l:"Pandas Docs"},{u:L.np,l:"NumPy Docs"}]),T("Python basics for finance — data loading, cleaning","3:30–5:30","learn",[{u:L.pd,l:"Pandas Docs"}]),T("Apply to 3 roles","5:30–6:30","job"),T("English: BBC + vocab","6:30–7:30","english")],
+[T("🔨 PROJECT: Download historical prices for portfolio","9:00–11:30","project",[{u:L.yf,l:"Yahoo Finance"}],["project"]),T("🔨 PROJECT: Calculate returns, correlations","3:30–5:30","project",[],["project"]),T("Apply to 3 roles","5:30–6:30","job"),T("English: EngVid + new words","6:30–7:30","english")],
+[T("🔨 PROJECT: VaR & CVaR — historical simulation","9:00–11:30","project",[{u:L.inv_var,l:"Investopedia VaR"}],["project"]),T("🔨 PROJECT: Monte Carlo simulation","3:30–6:30","project",[],["project"]),T("English: Write & Improve","6:30–7:30","english")],
+[T("🔨 PROJECT: Efficient frontier + Sharpe ratio","9:00–11:30","project",[],["project"]),T("🔨 PROJECT: Visualisations + write-up","3:30–6:30","project",[],["project"]),T("English: TED Talk + notes","6:30–7:30","english")],
+[T("🔨 PROJECT: Push to GitHub + portfolio + LinkedIn","9:00–11:30","project",[{u:L.li,l:"LinkedIn"}],["project"]),T("Apply to 5 roles + LinkedIn networking","3:30–6:30","job",[{u:L.li,l:"LinkedIn"}]),T("English: ELSA + full review","6:30–7:30","english")],
+]},
+{w:9,title:"Portfolio Polish + Interviews",dates:"May 18–22",intensity:"6.5 hrs/day + full job hunt",sched:{m:"9:00–11:30",e:"3:30–6:30",en:"6:30–7:30"},days:[
+[T("Portfolio site: Update all 4 projects with screenshots","9:00–11:30","job"),T("CV final polish + tailor for 3 different role types","3:30–6:30","job"),T("English: Mock interview practice","6:30–7:30","english")],
+[T("Technical interview prep: 3-statement walkthrough","9:00–11:30","job"),T("Technical prep: DCF walkthrough + Excel test practice","3:30–6:30","job"),T("English: Business presentation practice","6:30–7:30","english")],
+[T("Competency prep: Write 5 STAR method answers","9:00–11:30","job"),T("Apply to 5+ roles + connect with 3 professionals","3:30–6:30","job",[{u:L.li,l:"LinkedIn"}]),T("English: BBC + advanced vocab","6:30–7:30","english")],
+[T("Apply to 5+ roles + follow up all applications","9:00–11:30","job"),T("Mock interview: Record yourself answering 5 questions","3:30–6:30","job"),T("English: Write & Improve — cover letter","6:30–7:30","english")],
+[T("Apply to 5+ roles + tailored cover letters","9:00–11:30","job"),T("LinkedIn: post about your journey + engage","3:30–6:30","job",[{u:L.li,l:"LinkedIn"}]),T("English: ELSA + week review","6:30–7:30","english")],
+]},
+{w:10,title:"Job Hunt — Keep Pushing",dates:"May 25–29",intensity:"6.5 hrs/day · Interview mode",sched:{m:"9:00–11:30",e:"3:30–6:30",en:"6:30–7:30"},days:[
+[T("Apply to 5+ roles — target Big 4 graduate schemes","9:00–11:30","job"),T("Technical prep + Excel modelling test practice","3:30–6:30","job"),T("English: BBC + interview vocab","6:30–7:30","english")],
+[T("Apply to 5+ roles — target tech finance (Google, MS)","9:00–11:30","job"),T("Mock interview: competency questions","3:30–6:30","job"),T("English: EngVid advanced business","6:30–7:30","english")],
+[T("Apply to 5+ roles + networking calls","9:00–11:30","job",[{u:L.li,l:"LinkedIn"}]),T("Refine portfolio based on any feedback","3:30–6:30","job"),T("English: Write & Improve","6:30–7:30","english")],
+[T("Apply to 5+ roles + recruiter outreach","9:00–11:30","job"),T("Follow up on all applications from 2+ weeks ago","3:30–6:30","job"),T("English: TED Talk + vocab","6:30–7:30","english")],
+[T("Apply to 5+ roles + week review & strategy","9:00–11:30","job"),T("Connect with 5 UK finance professionals","3:30–6:30","job",[{u:L.li,l:"LinkedIn"}]),T("English: ELSA + full review","6:30–7:30","english")],
+]},
+{w:11,title:"Job Hunt — Intensify",dates:"Jun 1–5",intensity:"Full job hunt + English",sched:{m:"9:00–11:30",e:"3:30–6:30",en:"6:30–7:30"},days:[
+[T("Apply to 10 roles — broaden search to FP&A, credit","9:00–11:30","job"),T("Technical prep: case study practice","3:30–6:30","job"),T("English: Professional presentation","6:30–7:30","english")],
+[T("Apply to 10 roles + follow up previous","9:00–11:30","job"),T("Mock video interview practice","3:30–6:30","job"),T("English: EngVid + advanced vocab","6:30–7:30","english")],
+[T("Apply to 10 roles + agency sign-ups","9:00–11:30","job"),T("LinkedIn content: Share a project insight","3:30–6:30","job",[{u:L.li,l:"LinkedIn"}]),T("English: Write & Improve","6:30–7:30","english")],
+[T("Apply to 10 roles + tailored cover letters","9:00–11:30","job"),T("Interview prep: 'Why finance?' answer polish","3:30–6:30","job"),T("English: TED Talk + discussion notes","6:30–7:30","english")],
+[T("Apply to 10 roles + networking events online","9:00–11:30","job"),T("Week review: Track responses, adjust strategy","3:30–6:30","job"),T("English: Full week review + ELSA","6:30–7:30","english")],
+]},
+{w:12,title:"Job Hunt — Persistence",dates:"Jun 8–12",intensity:"Full job hunt + English",sched:{m:"9:00–11:30",e:"3:30–6:30",en:"6:30–7:30"},days:[
+[T("Apply to 10+ roles daily — keep momentum","9:00–11:30","job"),T("Technical tests: Excel + case study","3:30–6:30","job"),T("English: BBC + vocab","6:30–7:30","english")],
+[T("Apply to 10+ roles + recruiter calls","9:00–11:30","job"),T("Competency prep: new STAR answers","3:30–6:30","job"),T("English: EngVid + writing","6:30–7:30","english")],
+[T("Apply to 10+ roles + speculative applications","9:00–11:30","job"),T("Portfolio: Add any new work or feedback","3:30–6:30","job"),T("English: Write & Improve","6:30–7:30","english")],
+[T("Apply to 10+ roles + follow up 2-week-old apps","9:00–11:30","job"),T("Mock interview: Full 30-min practice","3:30–6:30","job"),T("English: TED Talk + discussion","6:30–7:30","english")],
+[T("Apply to 10+ roles + week strategy review","9:00–11:30","job"),T("Connect with 5 professionals + engage on posts","3:30–6:30","job",[{u:L.li,l:"LinkedIn"}]),T("English: ELSA + review","6:30–7:30","english")],
+]},
+{w:13,title:"Job Hunt — Almost There",dates:"Jun 15–19",intensity:"Full throttle 🔥",sched:{m:"9:00–11:30",e:"3:30–6:30",en:"6:30–7:30"},days:[
+[T("Apply + follow up + second interviews","9:00–11:30","job"),T("Advanced technical prep for interviews","3:30–6:30","job"),T("English: Professional English","6:30–7:30","english")],
+[T("Apply + negotiate strategy prep","9:00–11:30","job"),T("Practice salary negotiation scenarios","3:30–6:30","job"),T("English: EngVid","6:30–7:30","english")],
+[T("Apply + final portfolio tweaks","9:00–11:30","job"),T("Prepare references + recommendation requests","3:30–6:30","job",[{u:L.li,l:"LinkedIn"}]),T("English: Write & Improve","6:30–7:30","english")],
+[T("Apply + assessment centre prep","9:00–11:30","job"),T("Group exercise & presentation practice","3:30–6:30","job"),T("English: TED + professional vocab","6:30–7:30","english")],
+[T("🎉 Target: Finance role offer received!","9:00–11:30","milestone",[],["exam"]),T("Continue applying until offer is signed","3:30–6:30","job"),T("English: ELSA + celebrate progress","6:30–7:30","english")],
+]},
+{w:14,title:"Keep Applying — Don't Stop",dates:"Jun 22–26",intensity:"Until offer secured",sched:{m:"9:00–11:30",e:"3:30–6:30",en:"6:30–7:30"},days:[
+[T("Daily: Apply to 10+ roles","9:00–11:30","job"),T("Interview prep + follow ups","3:30–6:30","job"),T("English: Continue daily practice","6:30–7:30","english")],
+[T("Daily: Apply to 10+ roles","9:00–11:30","job"),T("Network + recruiter calls","3:30–6:30","job"),T("English: Vocab + writing","6:30–7:30","english")],
+[T("Daily: Apply to 10+ roles","9:00–11:30","job"),T("Technical prep","3:30–6:30","job"),T("English: Speaking practice","6:30–7:30","english")],
+[T("Daily: Apply to 10+ roles","9:00–11:30","job"),T("Mock interviews","3:30–6:30","job"),T("English: TED + notes","6:30–7:30","english")],
+[T("Daily: Apply to 10+ roles","9:00–11:30","job"),T("Weekly review + adjust strategy","3:30–6:30","job"),T("English: Full review","6:30–7:30","english")],
+]},
+{w:15,title:"BONUS — ACCA Applied Knowledge",dates:"When ready",intensity:"Optional · Self-paced",sched:{m:"9:00–11:30",e:"3:30–6:30",en:"6:30–7:30"},days:[
+[T("Register as ACCA student on acca.org","9:00–11:30","learn",[{u:L.acca,l:"ACCA Register"}]),T("ACCA MA: Costing — absorption, marginal","3:30–6:30","learn",[{u:L.acca_ma,l:"ACCA MA"}]),T("English: Daily practice","6:30–7:30","english")],
+[T("ACCA MA: Budgeting & variance analysis","9:00–11:30","learn",[{u:L.acca_ma,l:"ACCA MA"}]),T("ACCA MA: Performance measurement + mocks","3:30–6:30","learn",[{u:L.acca_ma,l:"ACCA MA"}]),T("English: Daily practice","6:30–7:30","english")],
+[T("🏅 ACCA MA Exam — SIT & PASS","9:00–12:00","milestone",[{u:L.acca,l:"ACCA"}],["exam"]),T("ACCA FA: Financial statements & double entry","3:30–6:30","learn",[{u:L.acca_fa,l:"ACCA FA"}]),T("English: Daily practice","6:30–7:30","english")],
+[T("ACCA FA: Trial balance, ledgers, adjustments","9:00–11:30","learn",[{u:L.acca_fa,l:"ACCA FA"}]),T("ACCA FA: Reporting & disclosures","3:30–6:30","learn",[{u:L.acca_fa,l:"ACCA FA"}]),T("English: Daily practice","6:30–7:30","english")],
+[T("ACCA FA: Past papers & mock revision","9:00–11:30","learn",[{u:L.acca_fa,l:"ACCA FA"}]),T("🏅 ACCA FA Exam — SIT & PASS","3:30–6:30","milestone",[{u:L.acca,l:"ACCA"}],["exam"]),T("English: Daily practice","6:30–7:30","english")],
+]},
+];
+
+// ══════════════════════════════════════════════════════════
+// VOCAB BANK
+// ══════════════════════════════════════════════════════════
+const VOCAB=[
+["Revenue","Money a company earns from selling goods or services","The company's revenue grew 12% this year."],
+["Liability","Money or obligations a company owes to others","Loans and unpaid bills are common liabilities."],
+["Equity","The owner's share of the company after subtracting debts","Equity = Total Assets minus Total Liabilities."],
+["Depreciation","Spreading the cost of an asset over its useful life","A £10,000 machine depreciated over 5 years costs £2,000/year."],
+["Amortisation","Same as depreciation but for intangible assets like patents","The software licence is amortised over 3 years."],
+["EBITDA","Earnings Before Interest, Taxes, Depreciation & Amortisation","EBITDA shows how much cash a business generates from operations."],
+["Cash Flow","The movement of money in and out of a business","Positive cash flow means more money coming in than going out."],
+["Working Capital","Current Assets minus Current Liabilities — short-term financial health","Healthy working capital means the company can pay its bills."],
+["Gross Margin","Revenue minus cost of goods sold, as a percentage","A 60% gross margin means 60p of every £1 is profit before expenses."],
+["Net Income","The final profit after ALL expenses, taxes, and costs","Net income is the 'bottom line' of the income statement."],
+["Balance Sheet","A snapshot of what a company owns and owes at one point in time","The balance sheet must always balance: Assets = Liabilities + Equity."],
+["P&L","Profit & Loss statement — shows revenue, costs, and profit over time","The P&L tells you if the company made or lost money this quarter."],
+["Dividend","A payment made to shareholders from the company's profits","The company pays a quarterly dividend of 5p per share."],
+["Valuation","Estimating what a company or asset is worth","We used DCF to arrive at a valuation of £50 million."],
+["WACC","Weighted Average Cost of Capital — cost of funding a business","A lower WACC means cheaper financing for the company."],
+["DCF","Discounted Cash Flow — values a company based on future cash flows","DCF models discount future cash to present value."],
+["Liquidity","How easily an asset can be converted to cash","Cash is the most liquid asset; property is illiquid."],
+["Solvency","A company's ability to meet long-term financial obligations","Good solvency means the company won't go bankrupt."],
+["ROI","Return on Investment — profit relative to cost","An ROI of 20% means you earned £20 for every £100 invested."],
+["Leverage","Using borrowed money to increase potential returns","High leverage amplifies both gains and losses."],
+["Accrual","Recording revenue/expenses when earned, not when cash moves","Accrual accounting gives a more accurate picture of finances."],
+["Audit","An independent examination of financial records","The annual audit confirmed the accounts were accurate."],
+["Benchmark","A standard used for comparison","The FTSE 100 is a common benchmark for UK stocks."],
+["Capital","Money or assets used to generate wealth","The startup raised £2 million in capital from investors."],
+["Collateral","An asset pledged as security for a loan","The house serves as collateral for the mortgage."],
+["Commodity","A basic good used in commerce — oil, gold, wheat","Oil is one of the most traded commodities globally."],
+["Compliance","Following rules, laws, and regulations","Financial compliance ensures companies follow reporting standards."],
+["Consolidation","Combining financial statements of parent and subsidiary companies","The consolidated accounts show the whole group's performance."],
+["Contingency","A potential future event that may cause a financial impact","The company set aside £1m as a contingency for legal costs."],
+["Credit Risk","The risk that a borrower won't repay their debt","Banks assess credit risk before approving loans."],
+["Derivative","A financial contract whose value comes from an underlying asset","Options and futures are common derivatives."],
+["Due Diligence","Thorough investigation before a business deal","Due diligence revealed hidden debts in the target company."],
+["Fiscal Year","A 12-month period used for accounting (not always Jan-Dec)","The UK government's fiscal year runs April to March."],
+["Goodwill","The extra value paid above a company's book value in an acquisition","Goodwill represents brand value, reputation, and customer loyalty."],
+["Hedge","An investment to reduce risk of price movements","Airlines hedge fuel costs to protect against price spikes."],
+["Impairment","A permanent decrease in the value of an asset","The company recorded a £5m goodwill impairment."],
+["Inflation","The rate at which prices increase over time","2% inflation means things cost 2% more than last year."],
+["Interest Rate","The cost of borrowing money, as a percentage","The Bank of England sets the base interest rate."],
+["IPO","Initial Public Offering — a company's first sale of stock to the public","The tech company raised £500m in its IPO."],
+["Margin Call","A demand to add funds when an investment drops in value","Traders dread margin calls during market crashes."],
+["Market Cap","Total value of a company's shares — price × number of shares","Apple's market cap exceeds $3 trillion."],
+["Maturity","The date when a loan or bond must be repaid","The bond reaches maturity in 2030."],
+["Merger","Two companies combining to form one","The merger created the third-largest bank in the UK."],
+["Monopoly","When one company dominates an entire market","Regulators prevent monopolies to protect consumers."],
+["Mortgage","A loan specifically for buying property","A 25-year mortgage is standard in the UK."],
+["Overhead","Ongoing business costs not directly tied to production","Rent, utilities, and insurance are overhead costs."],
+["Portfolio","A collection of investments held by a person or fund","A diversified portfolio reduces risk."],
+["Premium","An amount paid above the standard or expected price","Investors paid a premium for the high-growth stock."],
+["Principal","The original amount of money borrowed or invested","You pay interest on the principal of your loan."],
+["Provision","Money set aside for an expected future expense","The bank created a £2m provision for bad debts."],
+["Receivable","Money owed TO the company by customers","Accounts receivable are listed as current assets."],
+["Payable","Money the company owes TO suppliers","Accounts payable are listed as current liabilities."],
+["Recession","Two consecutive quarters of negative GDP growth","The 2008 recession was the worst since the Great Depression."],
+["Refinance","Replacing an existing loan with a new one, usually at better terms","They refinanced their mortgage to get a lower interest rate."],
+["Retained Earnings","Profits kept in the business rather than paid as dividends","Retained earnings fund future growth and investment."],
+["Shareholder","A person who owns shares in a company","Shareholders vote on major company decisions."],
+["Stake","An ownership interest in a company","The investor holds a 15% stake in the startup."],
+["Subsidy","Financial support given by a government to a business or sector","Farm subsidies help keep food prices stable."],
+["Supply Chain","The network of companies involved in making and delivering a product","Supply chain disruptions caused global shortages."],
+["Tender","A formal offer to supply goods or services at a stated price","The company won the government tender for the project."],
+["Treasury","The department managing a company's or government's money","The Treasury manages cash flow and financial risk."],
+["Underwriting","Assessing and assuming financial risk, often in insurance or IPOs","The bank is underwriting the company's bond issue."],
+["Variance","The difference between budgeted and actual figures","A favourable variance means spending less than planned."],
+["Volatility","How much the price of an asset fluctuates","High volatility means bigger price swings and more risk."],
+["Yield","The income return on an investment, usually as a percentage","The bond has a 4.5% annual yield."],
+["Write-off","Removing a bad debt or worthless asset from the books","The bank wrote off £3m in uncollectable loans."],
+["Acquisition","Buying another company or a major asset","The £2 billion acquisition doubled their market share."],
+["Arbitrage","Profiting from price differences in different markets","Currency arbitrage exploits exchange rate differences."],
+["Bear Market","A market where prices are falling 20%+ from recent highs","Investors become cautious during bear markets."],
+["Bull Market","A market where prices are rising consistently","The bull market lasted from 2009 to 2020."],
+["Blue Chip","A well-established, financially sound company","Unilever and HSBC are blue chip stocks."],
+["Bond","A debt instrument — you lend money and get interest back","Government bonds are considered very safe investments."],
+["Break-even","The point where revenue equals total costs — no profit, no loss","The cafe needs to sell 200 coffees/day to break even."],
+["Budget","A financial plan for a defined period","The department set a £500,000 annual budget."],
+["Capex","Capital Expenditure — money spent on long-term assets","Building a new factory is a major capex decision."],
+["Opex","Operating Expenditure — day-to-day running costs","Salaries, rent, and utilities are opex."],
+["Coupon","The interest payment on a bond","The bond pays a 5% annual coupon."],
+["Default","Failure to repay a debt as agreed","A loan default damages the borrower's credit rating."],
+["Diversification","Spreading investments to reduce risk","Diversification means not putting all eggs in one basket."],
+["Fiduciary","A person legally obligated to act in another's best interest","Financial advisors have a fiduciary duty to their clients."],
+["Forecasting","Predicting future financial performance based on data","Revenue forecasting is a key FP&A skill."],
+["Insolvency","When a company cannot pay its debts","Insolvency can lead to administration or liquidation."],
+["Proxy","Authority to act on someone's behalf, especially in voting","Shareholders can vote by proxy if they can't attend the meeting."],
+["Quarter","A three-month period used in financial reporting","Q1 is January to March in most companies."],
+["Restructuring","Reorganising a company's finances, operations, or structure","Corporate restructuring aims to improve profitability."],
+["Securities","Tradeable financial instruments — stocks, bonds, etc.","The SEC regulates securities markets in the US."],
+["Syndicate","A group of banks that jointly provide a large loan","The £500m loan was arranged by a syndicate of five banks."],
+["Tangible Asset","A physical asset you can touch — property, equipment, inventory","Machinery and land are tangible assets."],
+["Intangible Asset","A non-physical asset — patents, trademarks, brand value","A strong brand is a valuable intangible asset."],
+];
+
+const QUOTES=[
+"Every hour you invest compounds over your career.",
+"The analysts who get hired are the ones who practiced, not just studied.",
+"Future you will thank today's you for showing up.",
+"Discipline is choosing what you want MOST over what you want NOW.",
+"You don't have to be great to start. You have to start to be great.",
+"One week from now you'll wish you had started today.",
+"Small daily improvements lead to staggering long-term results.",
+"The FMVA exam isn't the finish line — it's the launch pad.",
+"Your portfolio is your proof. Every project speaks louder than a CV.",
+"Consistency beats intensity. Show up every single day.",
+"The UK finance market rewards those who prepare the hardest.",
+"Every rejection is data. Every interview is practice.",
+"You're not just studying finance — you're building your future.",
+"The gap between where you are and where you want to be is discipline.",
+];
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+const START_DATE = new Date(2026,2,16);
+const FMVA_TARGET = new Date(2026,3,29);
+
+let state;
+function loadState(){
+  try{ state = JSON.parse(localStorage.getItem("mctState")) || {}; }catch(e){ state = {}; }
+  if(!state.checked)   state.checked   = {};
+  if(!state.notes)     state.notes     = {};
+  if(!state.timeLog)   state.timeLog   = {};
+  if(!state.timers)    state.timers    = {m:{running:false,startedAt:null,elapsed:0},e:{running:false,startedAt:null,elapsed:0},en:{running:false,startedAt:null,elapsed:0}};
+  if(!state.gymDays)   state.gymDays   = {};
+  if(!state.jobs)      state.jobs      = [];
+  if(state.currentWeek===undefined) state.currentWeek = 0;
+  if(!state.currentView) state.currentView = 'study';
+}
+function saveState(){ try{ localStorage.setItem("mctState", JSON.stringify(state)); }catch(e){} }
+loadState();
+
+let currentWeek = state.currentWeek || 0;
+let currentView = state.currentView || 'study';
+let calViewYear = new Date().getFullYear();
+let calViewMonth = new Date().getMonth();
+let jobSortKey = 'date';
+let jobSortDir = 'desc';
+let noteTaskId = '';
+
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const JOB_STATUSES = ['Applied','In Progress','Assessment Centre','Interview','Offer','Rejected'];
+
+// ══════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════
+function taskId(w,d,i){ return `w${w}_d${d}_t${i}`; }
+function getAllTaskIds(){
+  const ids=[];
+  WEEKS.forEach(wk=>{ wk.days.forEach((day,di)=>{ day.forEach((_,ti)=>{ ids.push(taskId(wk.w,di,ti)); }); }); });
+  return ids;
+}
+function countDone(ids){ return ids.filter(id=>state.checked[id]).length; }
+
+function getDayOfJourney(){
+  const diff = Math.floor((new Date()-START_DATE)/(1000*60*60*24));
+  return Math.max(1, diff+1);
+}
+function getCountdown(){
+  const diff = Math.ceil((FMVA_TARGET - new Date())/(1000*60*60*24));
+  return diff>0 ? diff+"d" : diff===0 ? "TODAY!" : "Done ✓";
+}
+function getQuote(){ return QUOTES[getDayOfJourney() % QUOTES.length]; }
+function getVocabForDay(){
+  const day = getDayOfJourney();
+  const start = (day*3) % VOCAB.length;
+  return [0,1,2].map(i => VOCAB[(start+i) % VOCAB.length]);
+}
+function makeLinks(links){
+  if(!links||!links.length) return '';
+  return links.map(l=>`<a class="link-btn" href="${l.u}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${l.l} ${ARROW}</a>`).join('');
+}
+
+// Timer helpers
+function getTimerElapsed(block){
+  const t = state.timers[block];
+  if(!t) return 0;
+  let total = t.elapsed||0;
+  if(t.running && t.startedAt) total += Date.now() - t.startedAt;
+  return total;
+}
+function formatTime(ms){
+  const s = Math.floor(ms/1000);
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+function getTodayKey(){ return new Date().toISOString().slice(0,10); }
+function getTodayHours(){
+  const log = state.timeLog[getTodayKey()];
+  if(!log) return 0;
+  return (parseFloat(log.m)||0)+(parseFloat(log.e)||0)+(parseFloat(log.en)||0);
+}
+function getTotalHours(){
+  let h=0;
+  Object.values(state.timeLog).forEach(day=>{ h+=(parseFloat(day.m)||0)+(parseFloat(day.e)||0)+(parseFloat(day.en)||0); });
+  ['m','e','en'].forEach(b=>{ if(state.timers[b]&&state.timers[b].running) h+=getTimerElapsed(b)/3600000; });
+  return h.toFixed(1);
+}
+
+// ══════════════════════════════════════════════════════════
+// GYM / CALENDAR
+// ══════════════════════════════════════════════════════════
+function formatDateKey(d){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function getGymStreak(){
+  const today = new Date();
+  const todayKey = formatDateKey(today);
+  let d = new Date(today);
+  if(!state.gymDays[todayKey]) d.setDate(d.getDate()-1);
+  let streak = 0;
+  while(true){
+    const key = formatDateKey(d);
+    if(state.gymDays[key]){ streak++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+
+function getMonthlyGymPct(){
+  const today = new Date();
+  const year = today.getFullYear(), month = today.getMonth();
+  const elapsed = today.getDate();
+  let checked = 0;
+  for(let d=1; d<=elapsed; d++){
+    const key = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    if(state.gymDays[key]) checked++;
+  }
+  return Math.round((checked/elapsed)*100);
+}
+
+function toggleGym(dateKey){
+  state.gymDays[dateKey] = !state.gymDays[dateKey];
+  if(!state.gymDays[dateKey]) delete state.gymDays[dateKey];
+  saveState();
+  renderCalendar();
+  updateStatsBar();
+}
+
+function toggleCalendar(){
+  const w = document.getElementById('calWidget');
+  const b = document.getElementById('calBtn');
+  const open = w.classList.contains('show');
+  if(open){ w.classList.remove('show'); b.classList.remove('open'); }
+  else{ w.classList.add('show'); b.classList.add('open'); renderCalendar(); }
+}
+
+function navCalMonth(dir){
+  calViewMonth += dir;
+  if(calViewMonth>11){ calViewMonth=0; calViewYear++; }
+  if(calViewMonth<0){ calViewMonth=11; calViewYear--; }
+  renderCalendar();
+}
+
+function renderCalendar(){
+  const today = new Date();
+  const todayKey = formatDateKey(today);
+  document.getElementById('calMonthTitle').textContent = `${MONTH_NAMES[calViewMonth]} ${calViewYear}`;
+  document.getElementById('calStreakVal').textContent = getGymStreak();
+  document.getElementById('calPctVal').textContent = getMonthlyGymPct()+'%';
+
+  const firstDow = (new Date(calViewYear, calViewMonth, 1).getDay()+6)%7; // Mon=0
+  const totalDays = new Date(calViewYear, calViewMonth+1, 0).getDate();
+
+  let html = '';
+  ['M','T','W','T','F','S','S'].forEach(h=>{ html+=`<div class="cal-dh">${h}</div>`; });
+  for(let i=0;i<firstDow;i++) html+=`<div class="cal-day empty"></div>`;
+
+  for(let d=1; d<=totalDays; d++){
+    const dObj = new Date(calViewYear, calViewMonth, d);
+    const key = formatDateKey(dObj);
+    const isToday = key===todayKey;
+    const isFuture = dObj > today;
+    const isChecked = !!state.gymDays[key];
+    let cls = 'cal-day';
+    if(isChecked) cls += ' checked';
+    if(isToday)   cls += ' today';
+    if(isFuture)  cls += ' future';
+    html += `<div class="${cls}" onclick="toggleGym('${key}')">
+      <div class="cal-day-num">${d}</div>
+      <div class="cal-day-ico">${isChecked?'🏋️':''}</div>
+    </div>`;
+  }
+  document.getElementById('calGrid').innerHTML = html;
+}
+
+// Close calendar when clicking outside
+document.addEventListener('click', e=>{
+  const widget = document.getElementById('calWidget');
+  const btn = document.getElementById('calBtn');
+  if(widget && !widget.contains(e.target) && !btn.contains(e.target)){
+    widget.classList.remove('show');
+    btn.classList.remove('open');
+  }
+});
+
+// ══════════════════════════════════════════════════════════
+// VIEW SWITCHING
+// ══════════════════════════════════════════════════════════
+function switchView(view){
+  currentView = view;
+  state.currentView = view;
+  document.getElementById('studyView').style.display = view==='study' ? 'block' : 'none';
+  document.getElementById('jobView').style.display   = view==='jobs'  ? 'block' : 'none';
+  document.getElementById('tabStudy').classList.toggle('active', view==='study');
+  document.getElementById('tabJobs').classList.toggle('active',  view==='jobs');
+  if(view==='jobs') renderJobs();
+  saveState();
+}
+
+// ══════════════════════════════════════════════════════════
+// JOB TRACKER
+// ══════════════════════════════════════════════════════════
+function getJobStats(){
+  return {
+    total:      state.jobs.length,
+    interviews: state.jobs.filter(j=>['Interview','Assessment Centre'].includes(j.status)).length,
+    rejected:   state.jobs.filter(j=>j.status==='Rejected').length,
+    offers:     state.jobs.filter(j=>j.status==='Offer').length,
+  };
+}
+
+function addJob(){
+  const company  = document.getElementById('jCompany').value.trim();
+  const position = document.getElementById('jPosition').value.trim();
+  const link     = document.getElementById('jLink').value.trim();
+  if(!company || !position){ alert('Company and Position are required.'); return; }
+  state.jobs.unshift({ id:Date.now(), company, position, link:link||'', status:'Applied', date:getTodayKey() });
+  document.getElementById('jCompany').value  = '';
+  document.getElementById('jPosition').value = '';
+  document.getElementById('jLink').value     = '';
+  saveState(); renderJobs(); updateStatsBar();
+}
+
+function updateJobStatus(id, newStatus){
+  const job = state.jobs.find(j=>j.id===id);
+  if(job){ job.status=newStatus; saveState(); renderJobs(); updateStatsBar(); }
+}
+
+function deleteJob(id){
+  if(!confirm('Remove this application?')) return;
+  state.jobs = state.jobs.filter(j=>j.id!==id);
+  saveState(); renderJobs(); updateStatsBar();
+}
+
+function sortJobs(key){
+  if(jobSortKey===key) jobSortDir = jobSortDir==='asc'?'desc':'asc';
+  else{ jobSortKey=key; jobSortDir='asc'; }
+  renderJobs();
+}
+
+function renderJobs(){
+  const s = getJobStats();
+  document.getElementById('jTotal').textContent      = s.total;
+  document.getElementById('jInterviews').textContent = s.interviews;
+  document.getElementById('jRejected').textContent   = s.rejected;
+  document.getElementById('jOffers').textContent     = s.offers;
+
+  // Sort icons
+  ['company','position','status','date'].forEach(k=>{
+    const th = document.getElementById('th_'+k);
+    if(!th) return;
+    const isActive = jobSortKey===k;
+    th.classList.toggle('active-sort', isActive);
+    const arrow = isActive ? (jobSortDir==='asc'?'↑':'↓') : '<span style="opacity:0.25">↕</span>';
+    th.innerHTML = th.textContent.replace(/[↑↓]/g,'').trim() + ` <span class="sort-arrow">${arrow}</span>`;
+  });
+
+  const STATUS_RANK = Object.fromEntries(JOB_STATUSES.map((s,i)=>[s,i]));
+  const sorted = [...state.jobs].sort((a,b)=>{
+    let va = a[jobSortKey]||'', vb = b[jobSortKey]||'';
+    if(jobSortKey==='status'){ va=STATUS_RANK[a.status]??99; vb=STATUS_RANK[b.status]??99; }
+    if(va<vb) return jobSortDir==='asc'?-1:1;
+    if(va>vb) return jobSortDir==='asc'?1:-1;
+    return 0;
+  });
+
+  let html = '';
+  if(!sorted.length){
+    html = `<tr><td colspan="8"><div class="job-empty-state"><div class="jem-icon">📋</div><div class="jem-text">No applications yet — add your first one above!</div></div></td></tr>`;
+  } else {
+    sorted.forEach((j,i)=>{
+      const sc = j.status.replace(/ /g,'-');
+      const linkHtml = j.link
+        ? `<a class="job-portal-link" href="${j.link}" target="_blank" rel="noopener">${ARROW} Open</a>`
+        : `<span style="color:var(--text3);font-size:11px">—</span>`;
+      const opts = JOB_STATUSES.map(s=>`<option value="${s}"${j.status===s?' selected':''}>${s}</option>`).join('');
+      const fInfo = fileIndex[j.id];
+      const fileCell = fInfo
+        ? `<div class="file-chip"><span class="file-chip-name" onclick="downloadJobFile(${j.id})" title="Download ${escHtml(fInfo.name)}">${escHtml(fInfo.name)}</span><button class="file-chip-del" onclick="removeJobFile(${j.id})" title="Remove file">✕</button></div>`
+        : `<button class="attach-btn" onclick="triggerFileAttach(${j.id})">📎 Attach</button>`;
+      html += `<tr>
+        <td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px">${i+1}</td>
+        <td style="font-weight:600">${escHtml(j.company)}</td>
+        <td style="color:var(--text2)">${escHtml(j.position)}</td>
+        <td>${linkHtml}</td>
+        <td><select class="status-sel ${sc}" onchange="updateJobStatus(${j.id},this.value);this.className='status-sel '+this.value.replace(/ /g,'-')">${opts}</select></td>
+        <td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px">${j.date}</td>
+        <td>${fileCell}</td>
+        <td><button class="del-job-btn" onclick="deleteJob(${j.id})" title="Remove">✕</button></td>
+      </tr>`;
+    });
+  }
+  document.getElementById('jobTableBody').innerHTML = html;
+}
+
+function escHtml(str){ return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ══════════════════════════════════════════════════════════
+// INDEXEDDB — FILE STORAGE
+// ══════════════════════════════════════════════════════════
+let fileDB = null;
+let pendingFileJobId = null;
+const fileIndex = {};
+
+function openFileDB(){
+  return new Promise((resolve, reject)=>{
+    const req = indexedDB.open('mctFiles', 1);
+    req.onupgradeneeded = e=>{ e.target.result.createObjectStore('files'); };
+    req.onsuccess = e=>{ fileDB = e.target.result; resolve(fileDB); };
+    req.onerror = ()=>{ reject(req.error); };
+  });
+}
+function dbPut(jobId, fileObj){
+  return new Promise((resolve, reject)=>{
+    const tx = fileDB.transaction('files','readwrite');
+    tx.objectStore('files').put(fileObj, jobId);
+    tx.oncomplete = ()=>resolve();
+    tx.onerror = ()=>reject(tx.error);
+  });
+}
+function dbGet(jobId){
+  return new Promise((resolve, reject)=>{
+    const tx = fileDB.transaction('files','readonly');
+    const req = tx.objectStore('files').get(jobId);
+    req.onsuccess = ()=>resolve(req.result);
+    req.onerror = ()=>reject(req.error);
+  });
+}
+function dbDelete(jobId){
+  return new Promise((resolve, reject)=>{
+    const tx = fileDB.transaction('files','readwrite');
+    tx.objectStore('files').delete(jobId);
+    tx.oncomplete = ()=>resolve();
+    tx.onerror = ()=>reject(tx.error);
+  });
+}
+function dbGetAllKeys(){
+  return new Promise((resolve, reject)=>{
+    const tx = fileDB.transaction('files','readonly');
+    const req = tx.objectStore('files').getAllKeys();
+    req.onsuccess = ()=>resolve(req.result);
+    req.onerror = ()=>reject(req.error);
+  });
+}
+async function buildFileIndex(){
+  try{
+    await openFileDB();
+    const keys = await dbGetAllKeys();
+    for(const k of keys){
+      const f = await dbGet(k);
+      if(f) fileIndex[k] = {name: f.name, type: f.type};
+    }
+  }catch(e){ console.warn('File DB init:', e); }
+}
+function triggerFileAttach(jobId){
+  pendingFileJobId = jobId;
+  const input = document.getElementById('filePickerInput');
+  input.value = '';
+  input.click();
+}
+async function handleFilePicked(event){
+  const file = event.target.files[0];
+  if(!file || !pendingFileJobId) return;
+  const jobId = pendingFileJobId;
+  pendingFileJobId = null;
+  try{
+    const buf = await file.arrayBuffer();
+    await dbPut(jobId, { name: file.name, type: file.type, data: buf });
+    fileIndex[jobId] = { name: file.name, type: file.type };
+    renderJobs();
+  }catch(e){ alert('Failed to save: '+e.message); }
+}
+async function downloadJobFile(jobId){
+  try{
+    const f = await dbGet(jobId);
+    if(!f){ alert('File not found.'); return; }
+    const blob = new Blob([f.data], {type: f.type||'application/octet-stream'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href=url; a.download=f.name;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  }catch(e){ alert('Download failed: '+e.message); }
+}
+async function removeJobFile(jobId){
+  if(!confirm('Remove attached file?')) return;
+  try{
+    await dbDelete(jobId);
+    delete fileIndex[jobId];
+    renderJobs();
+  }catch(e){ alert('Could not remove: '+e.message); }
+}
+buildFileIndex().then(()=>{ if(currentView==='jobs') renderJobs(); });
+
+// ══════════════════════════════════════════════════════════
+// STATS BAR UPDATE
+// ══════════════════════════════════════════════════════════
+function updateStatsBar(){
+  const allIds = getAllTaskIds();
+  const done   = countDone(allIds);
+  const pct    = Math.round((done/allIds.length)*100);
+
+  document.getElementById("dayCount").textContent    = "Day "+getDayOfJourney();
+  document.getElementById("countdown").textContent   = getCountdown();
+  document.getElementById("totalHours").textContent  = getTotalHours()+"h";
+  document.getElementById("totalPct").textContent    = pct+"%";
+  document.getElementById("quoteBar").textContent    = '"'+getQuote()+'"';
+
+  document.getElementById("gymStreak").textContent   = getGymStreak()+"🔥";
+  document.getElementById("gymPct").textContent      = getMonthlyGymPct()+"%";
+
+  const js = getJobStats();
+  document.getElementById("statAppCount").textContent = js.total;
+  document.getElementById("statIntCount").textContent = js.interviews;
+}
+
+// ══════════════════════════════════════════════════════════
+// TIMER ACTIONS
+// ══════════════════════════════════════════════════════════
+function startTimer(block){
+  ['m','e','en'].forEach(b=>{ if(state.timers[b]&&state.timers[b].running&&b!==block) stopTimer(b); });
+  if(!state.timers[block]) state.timers[block]={running:false,startedAt:null,elapsed:0};
+  state.timers[block].running   = true;
+  state.timers[block].startedAt = Date.now();
+  closeTimerMenu();
+  saveState(); render(); syncStatBarTimer();
+}
+
+function stopTimer(block){
+  const t = state.timers[block];
+  if(!t||!t.running) return;
+  const sessionMs = Date.now() - t.startedAt;
+  t.elapsed += sessionMs;
+  t.running = false;
+  t.startedAt = null;
+  const key = getTodayKey();
+  if(!state.timeLog[key]) state.timeLog[key]={m:0,e:0,en:0};
+  state.timeLog[key][block] = (parseFloat(state.timeLog[key][block])||0) + (sessionMs/3600000);
+  saveState(); render(); syncStatBarTimer();
+}
+
+function stopActiveTimer(){
+  ['m','e','en'].forEach(b=>{ if(state.timers[b]&&state.timers[b].running) stopTimer(b); });
+}
+
+function resetTimer(block){
+  if(!confirm('Reset '+{m:'Morning',e:'Evening',en:'English'}[block]+' timer? (Saved hours kept)')) return;
+  state.timers[block]={running:false,startedAt:null,elapsed:0};
+  saveState(); render(); syncStatBarTimer();
+}
+
+function openTimerMenu(){ document.getElementById('stMenu').classList.toggle('show'); }
+function closeTimerMenu(){ document.getElementById('stMenu').classList.remove('show'); }
+document.addEventListener('click', e=>{
+  const timer = document.getElementById('statTimer');
+  if(timer && !timer.contains(e.target)) closeTimerMenu();
+});
+
+const BLOCK_NAMES = {m:'☀️ Morning',e:'🌙 Evening',en:'📚 English'};
+function syncStatBarTimer(){
+  const te = document.getElementById('statTimer');
+  const de = document.getElementById('stDisplay');
+  const ne = document.getElementById('stBlockName');
+  const sb = document.getElementById('stStartBtn');
+  const xb = document.getElementById('stStopBtn');
+  let active = null;
+  ['m','e','en'].forEach(b=>{ if(state.timers[b]&&state.timers[b].running) active=b; });
+  if(active){
+    te.classList.add('running');
+    de.textContent = formatTime(getTimerElapsed(active));
+    ne.textContent = BLOCK_NAMES[active]+' — Running';
+    sb.style.display='none'; xb.style.display='flex';
+  } else {
+    te.classList.remove('running');
+    de.textContent = '00:00:00';
+    ne.textContent = 'Click ▶ to start';
+    sb.style.display='flex'; xb.style.display='none';
+  }
+}
+
+// Live tick
+setInterval(()=>{
+  let active = null;
+  ['m','e','en'].forEach(b=>{ const t=state.timers[b]; if(t&&t.running){ active=b; const el=document.getElementById('timer_'+b); if(el) el.textContent=formatTime(getTimerElapsed(b)); }});
+  if(active){
+    const de=document.getElementById('stDisplay'); if(de) de.textContent=formatTime(getTimerElapsed(active));
+    const he=document.getElementById('totalHours'); if(he) he.textContent=getTotalHours()+'h';
+  }
+},1000);
+
+// ══════════════════════════════════════════════════════════
+// TASK ACTIONS
+// ══════════════════════════════════════════════════════════
+function toggleTask(id){
+  state.checked[id] = !state.checked[id];
+  if(!state.checked[id]) delete state.checked[id];
+  saveState(); render();
+}
+
+function navWeek(dir){
+  currentWeek = Math.max(0, Math.min(WEEKS.length-1, currentWeek+dir));
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ══════════════════════════════════════════════════════════
+// NOTES
+// ══════════════════════════════════════════════════════════
+function openNote(id, title){
+  noteTaskId = id;
+  document.getElementById("modalTitle").textContent = title;
+  document.getElementById("modalText").value = state.notes[id]||'';
+  document.getElementById("modalOverlay").classList.add("show");
+  setTimeout(()=>document.getElementById("modalText").focus(),100);
+}
+function closeModal(){ document.getElementById("modalOverlay").classList.remove("show"); }
+function saveNote(){
+  const txt = document.getElementById("modalText").value.trim();
+  if(txt) state.notes[noteTaskId]=txt; else delete state.notes[noteTaskId];
+  closeModal(); saveState(); render();
+}
+
+document.addEventListener("keydown", e=>{
+  if(e.key==="ArrowLeft"  && currentView==='study') navWeek(-1);
+  if(e.key==="ArrowRight" && currentView==='study') navWeek(1);
+  if(e.key==="Escape"){ closeModal(); document.getElementById('calWidget').classList.remove('show'); document.getElementById('calBtn').classList.remove('open'); }
+});
+
+// ══════════════════════════════════════════════════════════
+// MAIN RENDER
+// ══════════════════════════════════════════════════════════
+function render(){
+  const allIds = getAllTaskIds();
+  const totalDone = countDone(allIds);
+  const pct = Math.round((totalDone/allIds.length)*100);
+
+  // Overall
+  document.getElementById("doneCount").textContent    = totalDone;
+  document.getElementById("totalCount").textContent   = allIds.length;
+  document.getElementById("overallPct").textContent   = pct+"%";
+  document.getElementById("overallBar").style.width   = pct+"%";
+
+  // Stats bar
+  updateStatsBar();
+
+  // Phases
+  let phHtml = '';
+  PHASES.forEach(p=>{
+    const wIds=[];
+    p.weeks.forEach(wi=>{ const wk=WEEKS.find(w=>w.w===wi); if(wk) wk.days.forEach((day,di)=>{ day.forEach((_,ti)=>{ wIds.push(taskId(wi,di,ti)); }); }); });
+    const done=countDone(wIds), total=wIds.length, pp=total?Math.round((done/total)*100):0;
+    const isActive = p.weeks.includes(currentWeek);
+    phHtml += `<div class="phase-card${isActive?' active':''}" style="--phase-color:${p.color}" onclick="currentWeek=${p.weeks[0]};render()">
+      <div class="phase-emoji">${p.emoji}</div>
+      <div class="phase-name">${p.name}</div>
+      <div class="phase-dates">Wk ${p.weeks[0]}–${p.weeks[p.weeks.length-1]}</div>
+      <div class="phase-bar"><div class="phase-bar-fill" style="background:${p.color};width:${pp}%"></div></div>
+      <div class="phase-stat">${done}/${total} · ${pp}%</div>
+    </div>`;
+  });
+  document.getElementById("phases").innerHTML = phHtml;
+
+  // Week nav
+  const wk = WEEKS[currentWeek];
+  document.getElementById("weekNum").textContent       = wk.w<=14 ? "WEEK "+wk.w : "BONUS PHASE";
+  document.getElementById("weekTitle").textContent     = wk.title;
+  document.getElementById("weekDates").textContent     = wk.dates;
+  document.getElementById("weekIntensity").textContent = wk.intensity;
+  document.getElementById("prevWeek").disabled = currentWeek<=0;
+  document.getElementById("nextWeek").disabled = currentWeek>=WEEKS.length-1;
+  state.currentWeek = currentWeek;
+
+  // Days
+  const dayNames = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+  let html = '';
+
+  wk.days.forEach((tasks,di)=>{
+    const dayIds = tasks.map((_,ti)=>taskId(wk.w,di,ti));
+    const dayDone = countDone(dayIds), dayTotal = dayIds.length;
+    const allDone = dayDone===dayTotal;
+    const pc = allDone?"var(--green)":dayDone>0?"var(--amber)":"var(--text3)";
+
+    html += `<div class="day-card">
+      <div class="day-header" onclick="this.nextElementSibling.classList.toggle('collapsed')">
+        <div>
+          <div class="day-name">${dayNames[di]}</div>
+          <div class="day-schedule">🏋️ Gym 7:00–8:30 · Study ${wk.sched.m} + ${wk.sched.e} · English ${wk.sched.en}</div>
+        </div>
+        <div class="day-progress" style="color:${pc}">${dayDone}/${dayTotal} ${allDone?'✅':''}</div>
+      </div>
+      <div class="day-body">`;
+
+    let lastBlock='';
+    tasks.forEach((t,ti)=>{
+      const id = taskId(wk.w,di,ti);
+      const isDone = !!state.checked[id];
+      const timeBlock = t.time.split("–")[0];
+      if(timeBlock!==lastBlock){
+        const hr=parseInt(timeBlock);
+        let blockLabel = hr<12?"☀️ Morning Block":"🌙 Evening Block";
+        if(t.type==="english") blockLabel="📚 English Hour";
+        html += `<div class="day-time-label">${blockLabel} · ${t.time}</div>`;
+        lastBlock=timeBlock;
+      }
+
+      let cls="task";
+      if(isDone)         cls+=" done";
+      if(t.type==="project") cls+=" project";
+      if(t.type==="english") cls+=" english";
+      if(t.type==="job")     cls+=" job";
+      if(t.type==="milestone") cls+=" milestone";
+
+      let badges='';
+      if(t.flags.includes("project")) badges+=`<span class="badge badge-project">Portfolio</span>`;
+      if(t.flags.includes("exam"))    badges+=`<span class="badge badge-exam">Milestone</span>`;
+      if(t.type==="job")              badges+=`<span class="badge badge-job">Job Hunt</span>`;
+      const hasNote = !!state.notes[id];
+
+      html += `<div class="${cls}" onclick="toggleTask('${id}')">
+        <div class="cb"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#080b12" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="task-mid">
+          <div class="task-name">${t.task}</div>
+          <div class="task-badges">${badges}${makeLinks(t.links)}</div>
+        </div>
+        <div class="task-actions">
+          <button class="note-btn${hasNote?' has-note':''}" onclick="event.stopPropagation();openNote('${id}','${t.task.replace(/'/g,"&#39;")}')" title="Notes">📝</button>
+        </div>
+        <div class="done-mark">done ✓</div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+
+  html += `<div class="rest-day"><div class="rest-emoji">🏋️</div><div class="rest-title">Saturday — Rest & Recharge</div><div class="rest-sub">Part-time job · Gym · Recovery · Let your brain consolidate what you learned</div></div>`;
+  html += `<div class="rest-day"><div class="rest-emoji">😴</div><div class="rest-title">Sunday — Full Rest</div><div class="rest-sub">Part-time job · Rest · Prepare mentally for next week · You've earned it</div></div>`;
+
+  // Week complete
+  const weekIds=[]; wk.days.forEach((day,di)=>{ day.forEach((_,ti)=>{ weekIds.push(taskId(wk.w,di,ti)); }); });
+  const weekDone = countDone(weekIds)===weekIds.length;
+  html += `<div class="week-complete${weekDone?' show':''}"><div class="week-complete-text">🎉 WEEK ${wk.w} COMPLETE! You're unstoppable!</div></div>`;
+
+  // Study timer integrated into Learning Hub
+
+  document.getElementById("weekContent").innerHTML = html;
+
+  // Vocab
+  const words = getVocabForDay();
+  let vc = `<div class="vocab-header"><div class="vocab-title">📖 Daily Vocabulary</div><div class="vocab-day">Day ${getDayOfJourney()}</div></div><div class="vocab-cards">`;
+  words.forEach(w=>{ vc+=`<div class="vocab-word"><div class="vocab-term">${w[0]}</div><div class="vocab-def">${w[1]}</div><div class="vocab-ex">"${w[2]}"</div></div>`; });
+  vc += `</div>`;
+  document.getElementById("vocabSection").innerHTML = vc;
+
+  saveState();
+  syncStatBarTimer();
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════════
+// LEARNING ACHIEVEMENT SYSTEM - FINAL VERSION
+// ════════════════════════════════════════════════════════════════════
+
+// Initialize learning state
+if(!state.certificates) state.certificates = [];
+if(!state.skills) state.skills = [];
+if(!state.learningStreak) state.learningStreak = 0;
+if(!state.lastStreakDate) state.lastStreakDate = null;
+if(!state.todayTimerMinutes) state.todayTimerMinutes = 0;
+if(!state.timerRunning) state.timerRunning = false;
+if(!state.timerSeconds) state.timerSeconds = 0;
+if(!state.journeyStartDate) {
+  state.journeyStartDate = new Date(2026, 3, 15).getTime(); // April 15, 2026
+}
+
+// Timer interval
+let timerInterval = null;
+
+// ════ JOURNEY TRACKING ════
+function getJourneyDays() {
+  const start = new Date(2026, 3, 13); // April 13
+  const today = new Date(2026, 3, 15); // April 15
+  return Math.floor((today - start) / (1000 * 60 * 60 * 24));
+}
+
+function updateJourneyDisplay() {
+  const daysLeft = 91; // July 14 - April 15
+  document.getElementById('dayCount').textContent = `Day ${getJourneyDays()}`;
+  document.getElementById('countdown').textContent = daysLeft + 'd';
+}
+
+// ════ TIMER SYSTEM ════
+function startTimer() {
+  if(state.timerRunning) return;
+  state.timerRunning = true;
+  
+  const display = document.getElementById('stDisplay');
+  const btn = document.getElementById('stStartBtn');
+  const stopBtn = document.getElementById('stStopBtn');
+  
+  btn.style.display = 'none';
+  stopBtn.style.display = 'flex';
+  
+  timerInterval = setInterval(() => {
+    state.timerSeconds++;
+    state.todayTimerMinutes = state.timerSeconds / 60;
+    
+    const hours = Math.floor(state.timerSeconds / 3600);
+    const mins = Math.floor((state.timerSeconds % 3600) / 60);
+    const secs = state.timerSeconds % 60;
+    
+    display.textContent = `${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    
+    // Check if 2 hours reached today
+    if(state.todayTimerMinutes >= 120) {
+      checkAndAddStreak();
+    }
+    
+    saveState();
+  }, 1000);
+}
+
+function stopTimer() {
+  state.timerRunning = false;
+  clearInterval(timerInterval);
+  
+  const btn = document.getElementById('stStartBtn');
+  const stopBtn = document.getElementById('stStopBtn');
+  
+  btn.style.display = 'flex';
+  stopBtn.style.display = 'none';
+}
+
+function resetTimer() {
+  stopTimer();
+  state.timerSeconds = 0;
+  state.todayTimerMinutes = 0;
+  document.getElementById('stDisplay').textContent = '00:00:00';
+  saveState();
+}
+
+function checkAndAddStreak() {
+  const today = new Date(2026, 3, 15).toDateString();
+  
+  if(state.lastStreakDate !== today && state.todayTimerMinutes >= 120) {
+    state.learningStreak += 1;
+    state.lastStreakDate = today;
+    saveState();
+    updateLearningStats();
+    
+    // Show toast
+    showToast(`🔥 2-hour milestone reached! Streak +1 day`);
+  }
+}
+
+// ════ LEARNING STATS ════
+function updateLearningStats() {
+  const certs = state.certificates.length;
+  const skills = [...new Set(state.skills)].length;
+  
+  document.getElementById('statCerts').textContent = certs;
+  document.getElementById('statSkills').textContent = skills;
+  document.getElementById('statStreak').textContent = state.learningStreak + '🔥';
+}
+
+function toggleLearningHub(tab) {
+  const hub = document.getElementById('learningHub');
+  
+  // If clicking same tab, toggle close
+  if(hub.dataset.activeTab === tab && hub.classList.contains('open')) {
+    hub.classList.remove('open');
+    hub.dataset.activeTab = '';
+    return;
+  }
+  
+  hub.classList.add('open');
+  hub.dataset.activeTab = tab;
+  
+  if(tab === 'certificates') renderCertificatesTab();
+  else if(tab === 'skills') renderSkillsTab();
+  else if(tab === 'streak') renderStreakTab();
+}
+
+function closeLearningHub() {
+  const hub = document.getElementById('learningHub');
+  hub.classList.remove('open');
+  hub.dataset.activeTab = '';
+}
+
+// ════ CERTIFICATES TAB ════
+function renderCertificatesTab() {
+  let html = `
+    <div class="learning-hub-content">
+      <button class="learning-hub-close" onclick="closeLearningHub()">✕</button>
+      <div class="learning-hub-title">🏅 Certificates Earned</div>
+  `;
+  
+  if(state.certificates.length === 0) {
+    html += `
+      <div style="padding:32px;text-align:center">
+        <div style="font-size:48px;margin-bottom:12px">📜</div>
+        <div style="color:var(--text2);font-size:14px;margin-bottom:16px">No certificates yet</div>
+        <button class="btn-add-cert" onclick="switchToCertForm()">Add your first one!</button>
+      </div>
+    `;
+  } else {
+    html += `<div class="cert-list">`;
+    state.certificates.forEach(cert => {
+      html += `
+        <div class="cert-item">
+          <div class="cert-item-name">🏅 ${cert.name}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px">
+            ${cert.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
+          </div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+  
+  // Add certificate form
+  html += `
+    <div class="add-cert-form">
+      <div class="learn-section-title">➕ Add Certificate</div>
+      <div class="form-group">
+        <label class="form-label">Certificate Name</label>
+        <input class="form-input" id="certName" placeholder="e.g., Python Programming" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-input" id="certCategory">
+          <option value="finance">💰 Finance</option>
+          <option value="programming">🐍 Programming</option>
+          <option value="data">📊 Data Science</option>
+          <option value="tools">📈 Tools & Excel</option>
+          <option value="other">🎯 Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Skills Gained (comma-separated)</label>
+        <input class="form-input" id="certSkills" placeholder="OOP, Data Structures, APIs" />
+      </div>
+      <button class="btn-add-cert" onclick="addCertificate()">🎉 Add Certificate</button>
+    </div>
+  </div>
+  `;
+  
+  document.getElementById('learningHub').innerHTML = html;
+}
+
+// ════ SKILLS TAB ════
+function renderSkillsTab() {
+  const skills = [...new Set(state.skills)];
+  let html = `
+    <div class="learning-hub-content">
+      <button class="learning-hub-close" onclick="closeLearningHub()">✕</button>
+      <div class="learning-hub-title">🎯 Skills Learned</div>
+      <div style="font-size:28px;font-weight:800;color:var(--pink);margin-bottom:20px;text-align:center">
+        ${skills.length} Skills
+      </div>
+  `;
+  
+  if(skills.length === 0) {
+    html += `
+      <div style="padding:32px;text-align:center">
+        <div style="font-size:48px;margin-bottom:12px">📚</div>
+        <div style="color:var(--text2);font-size:14px">No skills yet - Add certificates to unlock them!</div>
+      </div>
+    `;
+  } else {
+    // Group by certificate
+    const skillsByCert = {};
+    state.certificates.forEach(cert => {
+      skillsByCert[cert.name] = cert.skills;
+    });
+    
+    html += `<div style="display:flex;flex-direction:column;gap:16px">`;
+    Object.entries(skillsByCert).forEach(([certName, certSkills]) => {
+      html += `
+        <div style="padding:12px;background:var(--surface);border-radius:10px">
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px">📜 ${certName}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            ${certSkills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
+          </div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+  
+  html += `</div>`;
+  document.getElementById('learningHub').innerHTML = html;
+}
+
+// ════ STREAK TAB ════
+function renderStreakTab() {
+  const today = new Date(2026, 3, 15).toDateString();
+  const timerHours = (state.todayTimerMinutes / 60).toFixed(1);
+  const streakStatus = state.learningStreak > 0 ? `🔥 Active` : `⚪ Not started`;
+  
+  let html = `
+    <div class="learning-hub-content">
+      <button class="learning-hub-close" onclick="closeLearningHub()">✕</button>
+      <div class="learning-hub-title">🔥 Learning Streak</div>
+      
+      <div style="text-align:center;padding:24px">
+        <div style="font-size:64px;font-weight:800;color:var(--fire);margin-bottom:8px">
+          ${state.learningStreak}
+        </div>
+        <div style="font-size:14px;color:var(--text2);margin-bottom:24px">Days Learning Streak</div>
+        <div style="padding:16px;background:var(--surface);border-radius:10px;margin-bottom:20px">
+          <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Today's Study Time</div>
+          <div style="font-size:24px;font-weight:800;color:var(--cyan)">${timerHours}h</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">Target: 2 hours for +1 day</div>
+        </div>
+      </div>
+      
+      <div style="padding:16px;background:linear-gradient(135deg,rgba(255,107,43,0.1),rgba(255,107,43,0.05));border:1px solid rgba(255,107,43,0.2);border-radius:10px;text-align:center">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:4px">Streak Status</div>
+        <div style="font-size:14px;font-weight:700;color:var(--fire)">${streakStatus}</div>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('learningHub').innerHTML = html;
+}
+
+// ════ CERTIFICATE MANAGEMENT ════
+function addCertificate() {
+  const name = document.getElementById('certName').value.trim();
+  const category = document.getElementById('certCategory').value;
+  const skillsText = document.getElementById('certSkills').value.trim();
+  
+  if(!name || !skillsText) {
+    alert('Please fill in certificate name and skills');
+    return;
+  }
+  
+  const skills = skillsText.split(',').map(s => s.trim()).filter(s => s);
+  
+  const cert = {
+    id: Date.now(),
+    name,
+    category,
+    skills,
+    date: new Date().toLocaleDateString()
+  };
+  
+  state.certificates.push(cert);
+  state.skills.push(...skills);
+  
+  // Clear form
+  document.getElementById('certName').value = '';
+  document.getElementById('certSkills').value = '';
+  document.getElementById('certCategory').value = 'finance';
+  
+  saveState();
+  updateLearningStats();
+  renderCertificatesTab();
+  
+  // Show toast
+  showToast(`🎉 Certificate Added! +${skills.length} skills unlocked!`);
+}
+
+function switchToCertForm() {
+  renderCertificatesTab();
+}
+
+// ════ UI HELPERS ════
+function showToast(message) {
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position:fixed;top:20px;right:20px;
+    background:rgba(0,230,118,0.15);border:1px solid var(--green);
+    color:var(--green);padding:12px 16px;border-radius:8px;
+    font-size:12px;z-index:9999;max-width:300px;
+    animation:slideIn 0.3s ease;
+  `;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  setTimeout(() => notification.remove(), 3000);
+}
+
+// ════ CSS ADDITIONS ════
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes slideIn {
+    from { transform: translateX(400px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  .learning-hub {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+  }
+  
+  .learning-hub.open {
+    display: flex;
+  }
+  
+  .learning-hub-content {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 14px;
+    padding: 24px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+  }
+  
+  .learning-hub-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 24px;
+    transition: all 0.2s;
+  }
+  
+  .learning-hub-close:hover {
+    color: var(--text);
+  }
+  
+  .learning-hub-title {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: var(--purple);
+  }
+  
+  .learn-section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  
+  .cert-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .cert-item {
+    padding: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: all 0.2s;
+  }
+  
+  .cert-item:hover {
+    border-color: var(--purple);
+    background: rgba(168, 85, 247, 0.05);
+  }
+  
+  .cert-item-name {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+  
+  .skill-tag {
+    font-size: 10px;
+    padding: 4px 10px;
+    background: rgba(236, 72, 153, 0.15);
+    border-radius: 12px;
+    color: var(--pink);
+  }
+  
+  .add-cert-form {
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-top: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 12px;
+  }
+  
+  .form-label {
+    font-size: 11px;
+    color: var(--text2);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  
+  .form-input {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 12px;
+  }
+  
+  .form-input:focus {
+    outline: none;
+    border-color: var(--purple);
+    box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15);
+  }
+  
+  .btn-add-cert {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  
+  .btn-add-cert:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(168, 85, 247, 0.3);
+  }
+  
+  select.form-input {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b95a8' stroke-width='2'%3e%3cpath d='M6 9l6 6 6-6'%3e%3c/path%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 1.2em;
+    padding-right: 32px;
+  }
+`;
+document.head.appendChild(style);
+
+// ════ INIT ════
+updateJourneyDisplay();
+updateLearningStats();
+// ══════════════════════════════════════════════════════════
+render();
+switchView(currentView);
+</script>
+</body>
+</html>
