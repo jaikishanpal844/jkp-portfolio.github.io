@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jai Kishan Pal — Financial Analyst</title>
-    <meta name="description" content="Jai Kishan Pal — MSc Finance Graduate. Aspiring Financial Analyst specialising in financial modelling, risk management, and corporate finance.">
+    <meta name="description" content="Jai Kishan Pal — MSc Finance (Commendation) graduate. Aspiring Financial Analyst specialising in financial modelling, risk management, and corporate finance.">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -138,9 +138,11 @@
         .skill-category-icon { width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; background: var(--gold-dim); border: 1px solid rgba(201, 168, 76, 0.12); border-radius: 10px; color: var(--gold); }
         .skill-category-icon svg { width: 22px; height: 22px; stroke: var(--gold); stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
         .skill-category h3 { font-size: 1rem; font-weight: 600; }
-        .skill-list { display: flex; flex-direction: column; gap: 0.7rem; }
-        .skill-item { display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: var(--text-dim); }
-        .skill-item::before { content: '→'; color: var(--gold); font-size: 0.85rem; flex-shrink: 0; }
+        .skill-list { display: flex; flex-direction: column; gap: 0.85rem; }
+        .skill-item { display: flex; justify-content: space-between; align-items: center; }
+        .skill-name { font-size: 0.88rem; color: var(--text-dim); }
+        .skill-bar { width: 100px; height: 3px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; }
+        .skill-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); border-radius: 2px; transition: width 1.2s ease; }
 
         /* PROJECTS */
         .featured-project { background: rgba(255,255,255,0.025); border: 1px solid rgba(201,168,76,0.25); border-radius: 20px; overflow: hidden; transition: all 0.3s; max-width: 1200px; margin: 0 auto 3rem; }
@@ -178,13 +180,10 @@
         .project-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.25rem; }
         .project-tag { padding: 4px 10px; background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.15); border-radius: 4px; font-size: 0.7rem; color: #60a5fa; font-family: 'JetBrains Mono', monospace; }
         .project-footer { display: flex; align-items: center; gap: 0.75rem; }
-        .project-link-disabled { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: #60a5fa; font-weight: 500; cursor: default; text-decoration: underline; text-underline-offset: 3px; }
-        .project-link-disabled svg { width: 14px; height: 14px; stroke: #60a5fa; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-        .project-status { display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; padding: 3px 10px; border-radius: 100px; }
-        .project-status.complete { color: #34d399; background: rgba(52, 211, 153, 0.08); border: 1px solid rgba(52, 211, 153, 0.2); }
-        .project-status.complete svg { width: 12px; height: 12px; stroke: #34d399; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-        .project-status.inprogress { color: #fbbf24; background: rgba(251, 191, 36, 0.06); border: 1px solid rgba(251, 191, 36, 0.1); }
-        .project-status.inprogress .status-dot { width: 5px; height: 5px; border-radius: 50%; background: #fbbf24; animation: pulse 2s infinite; }
+        .project-link-disabled { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 500; cursor: default; }
+        .project-link-disabled svg { width: 14px; height: 14px; stroke: var(--text-muted); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        .project-status { display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--text-muted); padding: 3px 10px; background: rgba(251, 191, 36, 0.06); border: 1px solid rgba(251, 191, 36, 0.1); border-radius: 100px; }
+        .project-status .status-dot { width: 5px; height: 5px; border-radius: 50%; background: #fbbf24; animation: pulse 2s infinite; }
 
         /* OBJECTIVES / CREDENTIALS */
         #objectives { background: var(--navy-light); }
@@ -254,11 +253,9 @@
 
         /* RESPONSIVE */
         @media (max-width: 768px) {
-            nav { padding: 1rem 1.5rem; gap: 10px; }
-            .nav-logo { font-size: 1.5rem; flex-shrink: 0; }
+            nav { padding: 1rem 1.5rem; }
             .nav-links { display: none; }
-            .nav-hamburger { display: flex; flex-shrink: 0; }
-            .nav-status { font-size: 0.6rem; padding: 3px 8px; white-space: nowrap; }
+            .nav-hamburger { display: flex; }
             .nav-links.open { display: flex; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: var(--navy); border-bottom: 1px solid var(--glass-border); padding: 1.5rem; gap: 1.5rem; }
             section { padding: 4rem 1.5rem; }
             .hero { padding: 0 1.5rem; }
@@ -272,13 +269,6 @@
             .contact-links { flex-direction: column; align-items: center; }
             footer { flex-direction: column; gap: 1rem; text-align: center; }
         }
-        @media (max-width: 400px) {
-            nav { padding: 0.8rem 1rem; }
-            .nav-logo { font-size: 1.4rem; }
-            .nav-status { font-size: 0.55rem; padding: 2px 6px; gap: 4px; }
-            .status-dot { width: 5px; height: 5px; }
-        }
-        .cert-link:hover { border-color: rgba(52, 211, 153, 0.3) !important; background: rgba(52, 211, 153, 0.06) !important; color: #34d399 !important; }
     </style>
 </head>
 <body>
@@ -310,7 +300,7 @@
         <div class="hero-content">
             <div class="hero-eyebrow">— Finance Analyst · United Kingdom</div>
             <h1>Jai Kishan Pal</h1>
-            <p class="hero-subtitle">MSc Finance Graduate with a strong quantitative foundation in mathematics, specialising in financial modelling, risk management, and corporate finance.</p>
+            <p class="hero-subtitle">MSc Finance (Commendation) graduate with a strong quantitative foundation in mathematics, specialising in financial modelling, risk management, and corporate finance.</p>
             <div class="hero-cta">
                 <a href="#projects" class="btn-primary">
                     <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
@@ -364,9 +354,9 @@
                     <h2 class="section-title">Bridging <span class="accent">Mathematics</span><br>&amp; Finance</h2>
                 </div>
                 <div class="about-text">
-                    <p>I'm Jai Kishan Pal — an MSc Finance Graduate from Nottingham Trent University with a foundational BSc in Mathematics from India. My academic journey has given me a strong blend of quantitative rigour and applied financial knowledge.</p>
-                    <p>My postgraduate studies covered the full spectrum of modern finance — from financial statement analysis and global markets to financial modelling, risk management, corporate finance, and corporate restructuring. Combined with a deep interest in macroeconomics and monetary policy, this gives me the analytical depth to interpret complex financial data and generate actionable insights — skills directly relevant to both corporate finance and central banking environments.</p>
-                    <p>I'm now translating this knowledge into hands-on projects using real-world data, and I'm actively seeking graduate programmes, analyst roles, and central bank opportunities across the UK and Europe.</p>
+                    <p>I'm Jai Kishan Pal — an MSc Finance graduate from Nottingham Trent University (passed with Commendation) with a foundational BSc in Mathematics from India. My academic journey has given me a strong blend of quantitative rigour and applied financial knowledge.</p>
+                    <p>My postgraduate studies covered the full spectrum of modern finance — from financial statement analysis and global markets to financial modelling, risk management, corporate finance, and corporate restructuring. This gives me the analytical depth to interpret complex financial data and generate actionable insights.</p>
+                    <p>I'm now translating this knowledge into hands-on projects using real-world data, and I'm actively seeking graduate programmes, internships, and analyst roles across the UK financial services sector.</p>
                 </div>
             </div>
             <div class="about-highlights">
@@ -376,7 +366,7 @@
                 </div>
                 <div class="highlight-card">
                     <div class="highlight-icon"><svg class="icon-svg lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
-                    <div class="highlight-text"><h4>Global Perspective</h4><p>Studying across India and the UK has given me exposure to diverse financial markets, regulatory frameworks, and central banking systems — including the ECB and Bank of England.</p></div>
+                    <div class="highlight-text"><h4>Global Perspective</h4><p>Studying across India and the UK has given me exposure to diverse financial markets, regulatory frameworks, and business cultures.</p></div>
                 </div>
                 <div class="highlight-card">
                     <div class="highlight-icon"><svg class="icon-svg lg" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></div>
@@ -384,7 +374,7 @@
                 </div>
                 <div class="highlight-card">
                     <div class="highlight-icon"><svg class="icon-svg lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
-                    <div class="highlight-text"><h4>Career Focus</h4><p>Targeting graduate programmes and analyst roles in corporate finance, equity research, risk management, FP&amp;A, and central banking across the UK and Europe.</p></div>
+                    <div class="highlight-text"><h4>Career Focus</h4><p>Targeting graduate programmes and analyst roles in corporate finance, equity research, FP&amp;A, and risk management across the UK.</p></div>
                 </div>
             </div>
         </div>
@@ -423,12 +413,13 @@
                 <div class="edu-content">
                     <h3>BSc Mathematics</h3>
                     <div class="edu-school"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Shyam Lal Pandaviya Government College, India</div>
-                    <p style="font-size:0.88rem;color:var(--text-dim);">Strong quantitative foundation in calculus, statistics, linear algebra, and probability theory — the analytical backbone of financial analysis.</p>
+                    <p style="font-size:0.88rem;color:var(--text-dim);">Strong quantitative foundation in calculus, statistics, linear algebra, probability theory, and mathematical modelling — the analytical backbone of financial analysis.</p>
                     <div class="edu-modules">
                         <span class="module-tag">Statistics</span>
                         <span class="module-tag">Probability</span>
                         <span class="module-tag">Linear Algebra</span>
                         <span class="module-tag">Calculus</span>
+                        <span class="module-tag">Mathematical Modelling</span>
                     </div>
                 </div>
             </div>
@@ -483,11 +474,10 @@
                     <h3>Financial Analysis</h3>
                 </div>
                 <div class="skill-list">
-                    <div class="skill-item">Financial Modelling</div>
-                    <div class="skill-item">DCF Valuation</div>
-                    <div class="skill-item">Financial Statement Analysis</div>
-                    <div class="skill-item">Risk Assessment</div>
-                    <div class="skill-item">Break-Even Analysis</div>
+                    <div class="skill-item"><span class="skill-name">Financial Modelling</span><div class="skill-bar"><div class="skill-bar-fill" style="width:78%"></div></div></div>
+                    <div class="skill-item"><span class="skill-name">DCF Valuation</span><div class="skill-bar"><div class="skill-bar-fill" style="width:75%"></div></div></div>
+                    <div class="skill-item"><span class="skill-name">Financial Statement Analysis</span><div class="skill-bar"><div class="skill-bar-fill" style="width:82%"></div></div></div>
+                    <div class="skill-item"><span class="skill-name">Risk Assessment</span><div class="skill-bar"><div class="skill-bar-fill" style="width:74%"></div></div></div>
                 </div>
             </div>
             <div class="skill-category">
@@ -496,11 +486,10 @@
                     <h3>Tools &amp; Software</h3>
                 </div>
                 <div class="skill-list">
-                    <div class="skill-item">Microsoft Excel</div>
-                    <div class="skill-item">Python (Pandas, NumPy)</div>
-                    <div class="skill-item">SQL</div>
-                    <div class="skill-item">Power BI</div>
-                    <div class="skill-item">Bloomberg Terminal</div>
+                    <div class="skill-item"><span class="skill-name">Microsoft Excel</span><div class="skill-bar"><div class="skill-bar-fill" style="width:72%"></div></div></div>
+                    <div class="skill-item"><span class="skill-name">Python (Pandas, NumPy)</span><div class="skill-bar"><div class="skill-bar-fill" style="width:50%"></div></div></div>
+                    <div class="skill-item"><span class="skill-name">SQL</span><div class="skill-bar"><div class="skill-bar-fill" style="width:45%"></div></div></div>
+                    <div class="skill-item"><span class="skill-name">Power BI</span><div class="skill-bar"><div class="skill-bar-fill" style="width:48%"></div></div></div>
                 </div>
             </div>
             <div class="skill-category">
@@ -509,10 +498,10 @@
                     <h3>Quantitative</h3>
                 </div>
                 <div class="skill-list">
-                    <div class="skill-item">Statistical Analysis</div>
-                    <div class="skill-item">Probability Theory</div>
-                    <div class="skill-item">Data Visualisation</div>
-                    <div class="skill-item">Regression Analysis</div>
+                    <div class="skill-item"><span class="skill-name">Statistical Analysis</span><div class="skill-bar"><div class="skill-bar-fill" style="width:85%"></div></div></div>
+                    <div class="skill-item"><span class="skill-name">Probability Theory</span><div class="skill-bar"><div class="skill-bar-fill" style="width:82%"></div></div></div>
+                    <div class="skill-item"><span class="skill-name">Mathematical Modelling</span><div class="skill-bar"><div class="skill-bar-fill" style="width:80%"></div></div></div>
+                    <div class="skill-item"><span class="skill-name">Data Visualisation</span><div class="skill-bar"><div class="skill-bar-fill" style="width:55%"></div></div></div>
                 </div>
             </div>
         </div>
@@ -545,13 +534,13 @@
                 </div>
                 <div class="project-highlights">
                     <div class="highlight-stat"><div class="highlight-stat-num">Excel</div><div class="highlight-stat-label">Primary Tool</div></div>
-                    <div class="highlight-stat"><div class="highlight-stat-num">MSc</div><div class="highlight-stat-label">Commendation</div></div>
                     <div class="highlight-stat"><div class="highlight-stat-num">Real</div><div class="highlight-stat-label">Client Project</div></div>
                 </div>
             </div>
         </div>
 
         <p style="color:var(--text-dim);max-width:1200px;margin:0 auto 2rem;font-size:0.95rem;">Self-directed projects demonstrating practical financial analysis skills. Each project is built from scratch using real-world data.</p>
+        </div>
         <div class="projects-grid">
             <div class="project-card">
                 <div class="project-banner"><div class="project-banner-bg">
@@ -559,12 +548,12 @@
                     <span class="project-type-badge"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg> Valuation</span>
                 </div></div>
                 <div class="project-body">
-                    <h3>DCF Valuation Model — Diageo</h3>
-                    <p>Full 5-year Discounted Cash Flow valuation of Diageo (FTSE 100). Includes historical financial analysis, revenue forecasting, WACC calculation, terminal value estimation, sensitivity analysis, and football field valuation chart.</p>
-                    <div class="project-tags"><span class="project-tag">Excel</span><span class="project-tag">Financial Modelling</span><span class="project-tag">WACC</span><span class="project-tag">Sensitivity Analysis</span><span class="project-tag">DCF</span></div>
+                    <h3>DCF Valuation Model</h3>
+                    <p>Complete 5-year Discounted Cash Flow model for a FTSE 100 company. Includes revenue forecasting, WACC calculation, sensitivity analysis, and football field valuation chart.</p>
+                    <div class="project-tags"><span class="project-tag">Excel</span><span class="project-tag">Financial Modelling</span><span class="project-tag">WACC</span><span class="project-tag">Sensitivity Analysis</span></div>
                     <div class="project-footer">
                         <span class="project-link-disabled"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg> View on GitHub</span>
-                        <span class="project-status complete"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Complete</span>
+                        <span class="project-status"><span class="status-dot"></span> In Progress</span>
                     </div>
                 </div>
             </div>
@@ -575,11 +564,11 @@
                 </div></div>
                 <div class="project-body">
                     <h3>FTSE 250 Financial Health Dashboard</h3>
-                    <p>Comprehensive ratio analysis of 10 FTSE 250 companies — including Greggs, JET2, Dunelm + 7 more across different sectors. Covers profitability, liquidity, efficiency, and solvency ratios with 3 years of trend data. Visualised in an interactive Power BI dashboard.</p>
-                    <div class="project-tags"><span class="project-tag">Power BI</span><span class="project-tag">Ratio Analysis</span><span class="project-tag">Excel</span><span class="project-tag">Financial Statements</span></div>
+                    <p>Comprehensive ratio analysis of 10 FTSE 250 companies — covering profitability, liquidity, efficiency, and solvency. Visualised in an interactive Power BI dashboard.</p>
+                    <div class="project-tags"><span class="project-tag">Power BI</span><span class="project-tag">Ratio Analysis</span><span class="project-tag">Excel</span></div>
                     <div class="project-footer">
                         <span class="project-link-disabled"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg> View on GitHub</span>
-                        <span class="project-status complete"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Complete</span>
+                        <span class="project-status"><span class="status-dot"></span> In Progress</span>
                     </div>
                 </div>
             </div>
@@ -590,11 +579,11 @@
                 </div></div>
                 <div class="project-body">
                     <h3>Portfolio Risk Analysis with Python</h3>
-                    <p>VaR and CVaR calculation for a diversified portfolio of FTSE 100 equities, S&amp;P 500 stocks, UK gilts, gold, and crude oil — using historical simulation and Monte Carlo methods. Includes efficient frontier optimisation and Sharpe ratio analysis.</p>
-                    <div class="project-tags"><span class="project-tag">Python</span><span class="project-tag">Monte Carlo</span><span class="project-tag">VaR / CVaR</span><span class="project-tag">NumPy</span><span class="project-tag">Pandas</span></div>
+                    <p>VaR and CVaR calculation for a multi-asset portfolio using historical simulation and Monte Carlo methods. Includes efficient frontier optimisation and Sharpe ratio analysis.</p>
+                    <div class="project-tags"><span class="project-tag">Python</span><span class="project-tag">Monte Carlo</span><span class="project-tag">VaR / CVaR</span><span class="project-tag">NumPy</span></div>
                     <div class="project-footer">
                         <span class="project-link-disabled"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg> View on GitHub</span>
-                        <span class="project-status complete"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Complete</span>
+                        <span class="project-status"><span class="status-dot"></span> In Progress</span>
                     </div>
                 </div>
             </div>
@@ -604,12 +593,12 @@
                     <span class="project-type-badge"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg> Research</span>
                 </div></div>
                 <div class="project-body">
-                    <h3>Equity Research Report — Rolls-Royce</h3>
-                    <p>Full equity research report on Rolls-Royce Holdings (FTSE 100) — industry overview, competitive positioning, financial analysis, valuation (DCF + comparables), and buy/hold/sell recommendation.</p>
-                    <div class="project-tags"><span class="project-tag">Equity Research</span><span class="project-tag">Comparable Analysis</span><span class="project-tag">DCF</span><span class="project-tag">Word / PDF</span></div>
+                    <h3>Equity Research Report</h3>
+                    <p>Full equity research report on a UK-listed company — industry overview, competitive positioning, financial analysis, valuation (DCF + comparables), and buy/hold/sell recommendation.</p>
+                    <div class="project-tags"><span class="project-tag">Equity Research</span><span class="project-tag">Comparable Analysis</span><span class="project-tag">Word / PDF</span></div>
                     <div class="project-footer">
                         <span class="project-link-disabled"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg> View on GitHub</span>
-                        <span class="project-status inprogress"><span class="status-dot"></span> In Progress</span>
+                        <span class="project-status"><span class="status-dot"></span> In Progress</span>
                     </div>
                 </div>
             </div>
@@ -628,17 +617,9 @@
             <div class="cert-card-old planned"><div class="cert-icon-wrap">📉</div><div><div class="cert-card-name">MOS Excel Expert + Power BI (PL-300)</div><div class="cert-issuer">Microsoft</div></div><div class="cert-card-status planned-status">Planned</div></div>
             <div class="cert-card-old planned"><div class="cert-icon-wrap">📘</div><div><div class="cert-card-name">CFA Level I</div><div class="cert-issuer">CFA Institute</div></div><div class="cert-card-status planned-status">Planned</div></div>
         </div>
-        <div style="max-width:1200px;margin:1.5rem auto 0;">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.75rem;">Additional Certifications</div>
-            <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                <a class="cert-link" href="https://credentials.corporatefinanceinstitute.com/c5c44ad0-6d99-4e90-9b57-e95242575384#acc.kGrOTEhA" target="_blank" style="display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;color:var(--text-dim);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:7px 14px;border-radius:6px;text-decoration:none;transition:all 0.25s;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Financial Analysis Fundamentals — CFI</a>
-                <a class="cert-link" href="https://portal.bloombergforeducation.com/certificates/iTvvxmP4jcJmRScBf9p5Rqf9" target="_blank" style="display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;color:var(--text-dim);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:7px 14px;border-radius:6px;text-decoration:none;transition:all 0.25s;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Environmental, Social &amp; Governance (ESG) — Bloomberg</a>
-                <a class="cert-link" href="https://portal.bloombergforeducation.com/certificates/ngw669ZYwcRhWSaVpXaw2aE6" target="_blank" style="display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;color:var(--text-dim);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:7px 14px;border-radius:6px;text-decoration:none;transition:all 0.25s;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Bloomberg Finance Fundamentals</a>
-                <a class="cert-link" href="bloomberg-spreadsheet-analysis.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;color:var(--text-dim);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:7px 14px;border-radius:6px;text-decoration:none;transition:all 0.25s;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Bloomberg Spreadsheet Analysis</a>
-                <a class="cert-link" href="https://www.linkedin.com/learning/certificates/b86eb118aade6db41a33930b04b8595bab58b708147faa51b668b94b4460e685" target="_blank" style="display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;color:var(--text-dim);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:7px 14px;border-radius:6px;text-decoration:none;transition:all 0.25s;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Project Management Simplified — LinkedIn</a>
-            </div>
-        </div>
     </section>
+
+    <!-- COMMERCIAL AWARENESS -->
     <section id="awareness" class="fade-in">
         <div class="section-header" style="max-width:1200px;margin:0 auto 4rem;">
             <div class="section-label"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg> — Commercial Awareness</div>
@@ -694,7 +675,7 @@
             </div>
             <div class="contact-grid-full fade-in">
                 <div>
-                    <p class="contact-intro-full">I'm actively seeking <strong>Finance Analyst, Graduate Scheme, Central Bank Programme, and Risk Management roles across the UK &amp; Europe</strong>. Open to relocate anywhere. Available immediately. If you're a recruiter, hiring manager, or finance professional — I'd love to hear from you.</p>
+                    <p class="contact-intro-full">I'm actively seeking <strong>Finance Analyst, Graduate Scheme, and Internship roles across the UK</strong>. Open to relocate anywhere. Available immediately. If you're a recruiter, hiring manager, or finance professional — I'd love to hear from you.</p>
                     <div class="contact-links-full">
                         <a href="mailto:jaikishanpal844@gmail.com" class="contact-link-full">
                             <div class="contact-link-icon-full">✉️</div>
@@ -710,22 +691,22 @@
                         </a>
                         <div class="contact-link-full" style="cursor:default;">
                             <div class="contact-link-icon-full">📍</div>
-                            <div><div class="contact-link-label-full">Location</div><div class="contact-link-value-full">Nottingham, United Kingdom <em style="color:var(--gold);font-style:italic;font-weight:400;font-size:12px;">(Open to Relocate)</em></div></div>
+                            <div><div class="contact-link-label-full">Location</div><div class="contact-link-value-full">Nottingham, United Kingdom</div></div>
                         </div>
                     </div>
                 </div>
                 <div class="contact-card-full">
                     <div class="contact-card-title-full">Open To</div>
-                    <div class="contact-card-sub-full">Available immediately for finance roles in the UK and Europe. Actively targeting:</div>
+                    <div class="contact-card-sub-full">Available immediately for finance roles anywhere in the UK. Actively targeting:</div>
                     <div class="open-to">
                         <div class="open-to-item">Finance Analyst (Graduate)</div>
-                        <div class="open-to-item">Central Bank Graduate Programmes (ECB Network)</div>
-                        <div class="open-to-item">Risk Management &amp; Financial Stability</div>
+                        <div class="open-to-item">Junior Finance Analyst</div>
                         <div class="open-to-item">Finance Graduate Schemes — Big 4</div>
+                        <div class="open-to-item">Finance Roles — Google · Microsoft · Tech</div>
                         <div class="open-to-item">Corporate Finance · FP&amp;A</div>
                         <div class="open-to-item">Finance Internships &amp; Placements</div>
                     </div>
-                    <div class="relocate-note">✈️ Open to relocate — London · Manchester · Edinburgh · anywhere in UK &amp; Europe</div>
+                    <div class="relocate-note">✈️ Open to relocate — London · Manchester · Birmingham · Edinburgh · anywhere in UK</div>
                 </div>
             </div>
         </div>
@@ -736,6 +717,7 @@
         <div class="footer-links">
             <a href="https://www.linkedin.com/in/jaik-pal/" target="_blank">LinkedIn</a>
             <a href="mailto:jaikishanpal844@gmail.com">Email</a>
+            <a href="progress.html" target="_blank" rel="noopener">Progress</a>
         </div>
     </footer>
 
