@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Query Walkthrough — Excel Data Cleaning Guide</title>
+    <meta name="description" content="Step-by-step Power Query walkthrough for cleaning space-delimited pasted text into structured columns in Excel.">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #0a0e1a;
+            --navy-light: #111827;
+            --navy-mid: #1a2332;
+            --gold: #c9a84c;
+            --gold-light: #e4c76b;
+            --gold-dim: rgba(201, 168, 76, 0.15);
+            --text: #e8e6e3;
+            --text-dim: #8a9bb5;
+            --text-muted: #4a5568;
+            --accent-blue: #2563eb;
+            --accent-green: #10B981;
+            --accent-purple: #a78bfa;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --code-bg: #0d1117;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--gold) var(--navy); }
+        body { font-family: 'DM Sans', sans-serif; background: var(--navy); color: var(--text); line-height: 1.75; overflow-x: hidden; }
+
+        /* NAV */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            padding: 1.2rem 3rem; display: flex; justify-content: space-between; align-items: center;
+            backdrop-filter: blur(20px); background: rgba(10, 14, 26, 0.9);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--gold); text-decoration: none; letter-spacing: 1px; }
+        .nav-logo span { color: var(--text); font-weight: 400; }
+        .nav-back { display: inline-flex; align-items: center; gap: 6px; color: var(--text-dim); text-decoration: none; font-size: 0.82rem; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; transition: color 0.2s; }
+        .nav-back:hover { color: var(--gold); }
+        .nav-back svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+        /* HERO */
+        .guide-hero {
+            padding: 9rem 3rem 4rem;
+            max-width: 900px; margin: 0 auto;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .guide-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 5px 14px; background: var(--gold-dim);
+            border: 1px solid rgba(201, 168, 76, 0.2); border-radius: 100px;
+            font-size: 0.7rem; font-weight: 600; color: var(--gold);
+            letter-spacing: 2px; text-transform: uppercase; margin-bottom: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .guide-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 700; line-height: 1.2; margin-bottom: 1rem;
+        }
+        .guide-hero h1 .accent { color: var(--gold); }
+        .guide-hero .subtitle { font-size: 1rem; color: var(--text-dim); max-width: 680px; font-weight: 300; }
+        .guide-meta { display: flex; gap: 2rem; margin-top: 2rem; flex-wrap: wrap; }
+        .meta-item { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+        .meta-item svg { width: 13px; height: 13px; stroke: var(--gold); stroke-width: 2; fill: none; }
+
+        /* CONTENT */
+        .guide-content { max-width: 900px; margin: 0 auto; padding: 4rem 3rem 6rem; }
+
+        /* TOC */
+        .toc {
+            background: var(--navy-mid); border: 1px solid var(--glass-border);
+            border-left: 3px solid var(--gold);
+            border-radius: 8px; padding: 1.5rem 2rem; margin-bottom: 3.5rem;
+        }
+        .toc-title { font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 1rem; }
+        .toc ol { padding-left: 1.2rem; }
+        .toc li { margin-bottom: 0.35rem; }
+        .toc a { color: var(--text-dim); text-decoration: none; font-size: 0.88rem; transition: color 0.2s; }
+        .toc a:hover { color: var(--gold); }
+        .toc .sub { list-style: disc; padding-left: 1rem; margin-top: 0.3rem; }
+        .toc .sub li { margin-bottom: 0.2rem; }
+
+        /* SECTION HEADINGS */
+        .guide-section { margin-bottom: 3.5rem; }
+        .section-num {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+            color: var(--gold); letter-spacing: 3px; text-transform: uppercase;
+            margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .section-num::after { content: ''; flex: 1; height: 1px; background: var(--glass-border); }
+        h2 {
+            font-family: 'Playfair Display', serif; font-size: 1.6rem;
+            font-weight: 700; margin-bottom: 1.2rem; color: var(--text);
+        }
+        h3 { font-size: 1.05rem; font-weight: 600; margin: 1.8rem 0 0.8rem; color: var(--gold-light); }
+        h4 { font-size: 0.9rem; font-weight: 600; margin: 1.4rem 0 0.6rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; font-family: 'JetBrains Mono', monospace; }
+        p { margin-bottom: 1rem; color: var(--text); font-size: 0.95rem; }
+
+        /* CALLOUT BOXES */
+        .callout {
+            border-radius: 8px; padding: 1.1rem 1.4rem; margin: 1.4rem 0;
+            border-left: 3px solid; font-size: 0.9rem;
+        }
+        .callout-title { font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; margin-bottom: 0.4rem; }
+        .callout.info { background: rgba(37, 99, 235, 0.08); border-color: var(--accent-blue); }
+        .callout.info .callout-title { color: #60a5fa; }
+        .callout.success { background: rgba(16, 185, 129, 0.08); border-color: var(--accent-green); }
+        .callout.success .callout-title { color: var(--accent-green); }
+        .callout.warning { background: rgba(201, 168, 76, 0.08); border-color: var(--gold); }
+        .callout.warning .callout-title { color: var(--gold); }
+        .callout.approach { background: rgba(167, 139, 250, 0.08); border-color: var(--accent-purple); }
+        .callout.approach .callout-title { color: var(--accent-purple); }
+
+        /* CODE BLOCKS */
+        pre, code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+        }
+        pre {
+            background: var(--code-bg); border: 1px solid var(--glass-border);
+            border-radius: 8px; padding: 1.2rem 1.5rem; overflow-x: auto;
+            margin: 1.2rem 0; line-height: 1.7;
+        }
+        code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; font-size: 0.83rem; color: var(--gold-light); }
+        pre code { background: none; padding: 0; color: var(--text); }
+        .comment { color: var(--text-muted); }
+        .kw { color: #79c0ff; }
+        .str { color: #a5d6ff; }
+        .fn { color: var(--gold-light); }
+        .val { color: #f47067; }
+
+        /* STEPS */
+        .steps { counter-reset: step; list-style: none; padding: 0; }
+        .steps li {
+            counter-increment: step;
+            display: flex; gap: 1.1rem; margin-bottom: 1.2rem; align-items: flex-start;
+        }
+        .steps li::before {
+            content: counter(step);
+            flex-shrink: 0;
+            width: 28px; height: 28px;
+            background: var(--gold-dim); border: 1px solid rgba(201, 168, 76, 0.35);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600;
+            color: var(--gold); margin-top: 2px;
+        }
+        .steps li p { margin: 0; font-size: 0.93rem; }
+        .step-label { font-weight: 600; color: var(--text); }
+        kbd {
+            display: inline-block; padding: 2px 7px;
+            background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.12);
+            border-bottom: 2px solid rgba(255,255,255,0.18);
+            border-radius: 4px; font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem; color: var(--text-dim);
+        }
+        .arrow { color: var(--gold); margin: 0 4px; }
+
+        /* APPROACH CARDS */
+        .approach-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin: 1.5rem 0; }
+        @media (max-width: 680px) { .approach-grid { grid-template-columns: 1fr; } }
+        .approach-card {
+            background: var(--navy-mid); border: 1px solid var(--glass-border);
+            border-radius: 10px; padding: 1.3rem;
+        }
+        .approach-card.active { border-color: rgba(167, 139, 250, 0.35); }
+        .approach-card h4 { margin-top: 0; }
+        .approach-card p { font-size: 0.88rem; color: var(--text-dim); }
+
+        /* SAMPLE DATA TABLE */
+        .data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+        .data-table {
+            width: 100%; border-collapse: collapse;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+        }
+        .data-table th {
+            background: var(--navy-mid); color: var(--gold);
+            padding: 8px 12px; text-align: left; border: 1px solid var(--glass-border);
+            font-size: 0.72rem; letter-spacing: 1px; text-transform: uppercase;
+        }
+        .data-table td {
+            padding: 7px 12px; border: 1px solid var(--glass-border);
+            color: var(--text-dim); vertical-align: top;
+        }
+        .data-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+        .highlight-cell { color: var(--accent-green) !important; }
+        .warn-cell { color: #f87171 !important; }
+
+        /* DIVIDER */
+        .guide-divider { border: none; border-top: 1px solid var(--glass-border); margin: 3rem 0; }
+
+        /* FINISH BOX */
+        .finish-box {
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.08), rgba(167, 139, 250, 0.06));
+            border: 1px solid rgba(201, 168, 76, 0.2);
+            border-radius: 12px; padding: 2rem; margin-top: 3rem; text-align: center;
+        }
+        .finish-box h3 { color: var(--gold); margin-top: 0; font-size: 1.1rem; }
+        .finish-box p { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 0; }
+
+        /* PILL TAGS */
+        .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 1rem 0; }
+        .tag {
+            font-size: 0.72rem; font-family: 'JetBrains Mono', monospace;
+            padding: 3px 10px; border-radius: 100px;
+            border: 1px solid var(--glass-border); color: var(--text-muted);
+        }
+        .tag.green { border-color: rgba(16,185,129,0.35); color: var(--accent-green); }
+        .tag.gold { border-color: rgba(201,168,76,0.35); color: var(--gold); }
+        .tag.purple { border-color: rgba(167,139,250,0.35); color: var(--accent-purple); }
+        .tag.blue { border-color: rgba(37,99,235,0.35); color: #60a5fa; }
+
+        @media (max-width: 768px) {
+            nav { padding: 1rem 1.5rem; }
+            .guide-hero, .guide-content { padding-left: 1.5rem; padding-right: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html" class="nav-logo">JKP<span> / Portfolio</span></a>
+    <a href="index.html" class="nav-back">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Portfolio
+    </a>
+</nav>
+
+<!-- HERO -->
+<header class="guide-hero">
+    <div class="guide-badge">📊 Excel &amp; Power Query</div>
+    <h1>Power Query <span class="accent">Data Cleaning</span> Walkthrough</h1>
+    <p class="subtitle">
+        How to reliably parse space-delimited pasted text with multi-word fields into five clean columns
+        — Customer, Product, Region, Amount, Date — using Power Query in Excel.
+    </p>
+    <div class="guide-meta">
+        <span class="meta-item">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            Excel 2016 / Microsoft 365
+        </span>
+        <span class="meta-item">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ~15 min read
+        </span>
+        <span class="meta-item">
+            <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+            Power Query / M Language
+        </span>
+    </div>
+</header>
+
+<!-- CONTENT -->
+<main class="guide-content">
+
+    <!-- TOC -->
+    <nav class="toc" aria-label="Table of contents">
+        <div class="toc-title">Contents</div>
+        <ol>
+            <li><a href="#scenario">The Scenario &amp; Sample Data</a></li>
+            <li><a href="#excel-steps">Step 1 — Paste &amp; Load into Power Query</a></li>
+            <li><a href="#approach-a">Step 2A — Approach A: Paste created tab-separated columns</a>
+                <ul class="sub">
+                    <li><a href="#a-delimiter">Verify delimiter &amp; promote headers</a></li>
+                    <li><a href="#a-types">Set column data types</a></li>
+                </ul>
+            </li>
+            <li><a href="#approach-b">Step 2B — Approach B: Paste landed as a single column</a>
+                <ul class="sub">
+                    <li><a href="#b-split">Split column by whitespace</a></li>
+                    <li><a href="#b-identify">Identify Region, Amount, Date tokens</a></li>
+                    <li><a href="#b-recombine">Recombine Customer &amp; Product tokens</a></li>
+                </ul>
+            </li>
+            <li><a href="#clean-up">Step 3 — Clean up: blanks, trim, case, types</a></li>
+            <li><a href="#close-load">Step 4 — Close &amp; Load</a></li>
+            <li><a href="#cheatsheet">Quick Reference Cheat Sheet</a></li>
+        </ol>
+    </nav>
+
+    <!-- SECTION 1 — SCENARIO -->
+    <section class="guide-section" id="scenario">
+        <div class="section-num">01 — Scenario</div>
+        <h2>The Scenario &amp; Sample Data</h2>
+
+        <p>
+            A colleague sends a plain-text report. You copy it and paste it into Excel.
+            Each row represents a sale, but because Customer names and Product names can each contain
+            a space (e.g. <em>John Smith</em>, <em>Whey Powder</em>), you cannot split on every space blindly.
+            The five fields you need are:
+        </p>
+
+        <div class="tags">
+            <span class="tag gold">Customer</span>
+            <span class="tag gold">Product</span>
+            <span class="tag green">Region</span>
+            <span class="tag purple">Amount</span>
+            <span class="tag blue">Date</span>
+        </div>
+
+        <h3>Raw pasted text (space-delimited, inconsistent spacing)</h3>
+        <pre>John Smith     Whey Powder    North   150.00   2024-01-15
+Alice Brown    Protein Shake  East    89.99    2024-01-16
+Bob Johnson    BCAAs          South   45.50    2024-01-17
+Diana Prince   Whey Powder    West    150.00   2024-01-18
+Alice Brown    BCAAs          North   45.50    2024-01-19
+               &lt;blank row&gt;
+(blank)        Protein Shake  East    89.99    2024-01-20</pre>
+
+        <div class="callout warning">
+            <div class="callout-title">⚠ Key challenge</div>
+            Both <strong>Customer</strong> (e.g. "John Smith") and <strong>Product</strong> (e.g. "Whey Powder")
+            may be two words separated by a single space — so naively splitting on every space produces too many
+            columns. The strategy is to anchor on the <em>known fields</em>: Region is always one of
+            {North, South, East, West}, Amount is always numeric, and Date is always in a date format.
+        </div>
+
+        <h3>Target output (5 clean columns)</h3>
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Region</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>John Smith</td><td>Whey Powder</td><td class="highlight-cell">North</td><td class="highlight-cell">150.00</td><td class="highlight-cell">2024-01-15</td></tr>
+                    <tr><td>Alice Brown</td><td>Protein Shake</td><td class="highlight-cell">East</td><td class="highlight-cell">89.99</td><td class="highlight-cell">2024-01-16</td></tr>
+                    <tr><td>Bob Johnson</td><td>BCAAs</td><td class="highlight-cell">South</td><td class="highlight-cell">45.50</td><td class="highlight-cell">2024-01-17</td></tr>
+                    <tr><td>Diana Prince</td><td>Whey Powder</td><td class="highlight-cell">West</td><td class="highlight-cell">150.00</td><td class="highlight-cell">2024-01-18</td></tr>
+                    <tr><td>Alice Brown</td><td>BCAAs</td><td class="highlight-cell">North</td><td class="highlight-cell">45.50</td><td class="highlight-cell">2024-01-19</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <hr class="guide-divider">
+
+    <!-- SECTION 2 — EXCEL STEPS -->
+    <section class="guide-section" id="excel-steps">
+        <div class="section-num">02 — Excel Setup</div>
+        <h2>Step 1 — Paste &amp; Load into Power Query</h2>
+
+        <p>
+            Do this regardless of which approach (A or B) you follow next.
+            The goal is to get your pasted data into the Power Query Editor.
+        </p>
+
+        <ol class="steps">
+            <li>
+                <p>
+                    <span class="step-label">Paste the text.</span>
+                    Click an empty cell (e.g. <code>A1</code>), then press <kbd>Ctrl</kbd>+<kbd>V</kbd>.
+                    Excel may paste as a single column or as multiple columns — note which case you get.
+                    (<em>See Approach A vs B below.</em>)
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Select your data range.</span>
+                    Click anywhere inside the pasted data. If the data is a single column, select that
+                    column from the first row to the last non-empty row.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Convert to an Excel Table.</span>
+                    Press <kbd>Ctrl</kbd>+<kbd>T</kbd>. In the "Create Table" dialog, confirm the range
+                    and tick <em>"My table has headers"</em> if the first row is a header — otherwise
+                    leave it unchecked. Click <strong>OK</strong>.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Open Power Query.</span>
+                    Go to <kbd>Data</kbd> tab <span class="arrow">→</span>
+                    <strong>Get &amp; Transform Data</strong> group <span class="arrow">→</span>
+                    click <strong>From Table/Range</strong>.
+                    The Power Query Editor window opens with your data loaded.
+                </p>
+            </li>
+        </ol>
+
+        <div class="callout info">
+            <div class="callout-title">ℹ Note — "From Table/Range" vs other connectors</div>
+            "From Table/Range" reads the Excel table you just created directly in memory —
+            no file path needed. All transformations are recorded as steps you can edit at any time
+            in the <em>Applied Steps</em> pane on the right.
+        </div>
+    </section>
+
+    <hr class="guide-divider">
+
+    <!-- APPROACH OVERVIEW -->
+    <section class="guide-section">
+        <div class="section-num">03 — Choose Your Approach</div>
+        <h2>Which paste result did you get?</h2>
+
+        <div class="approach-grid">
+            <div class="approach-card active">
+                <h4 class="tag purple" style="display:inline-block;margin-bottom:0.8rem;">Approach A</h4>
+                <p>
+                    Excel already split the text into <strong>multiple columns</strong> (likely tab-separated
+                    in the original).  You see 5+ columns in the worksheet.
+                    <br><br>Go to <a href="#approach-a" style="color:var(--accent-purple);">Step 2A →</a>
+                </p>
+            </div>
+            <div class="approach-card active">
+                <h4 class="tag blue" style="display:inline-block;margin-bottom:0.8rem;">Approach B</h4>
+                <p>
+                    Excel put everything into <strong>one column</strong> — each row is one long string
+                    with fields separated by spaces.
+                    <br><br>Go to <a href="#approach-b" style="color:#60a5fa;">Step 2B →</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <hr class="guide-divider">
+
+    <!-- APPROACH A -->
+    <section class="guide-section" id="approach-a">
+        <div class="section-num">04 — Approach A</div>
+        <h2>Step 2A — Paste Created Tab-Separated Columns</h2>
+
+        <p>
+            If Excel correctly created 5 (or more) columns when you pasted, the heavy lifting is already
+            done. You just need to verify the delimiter, clean up header names, and set data types.
+        </p>
+
+        <h3 id="a-delimiter">Verify delimiter &amp; promote headers</h3>
+
+        <ol class="steps">
+            <li>
+                <p>
+                    <span class="step-label">Check column count.</span>
+                    In the Power Query Editor, confirm you see exactly 5 columns in the preview.
+                    If you see more than 5, extra splits happened — use <strong>Remove Columns</strong>
+                    to drop unwanted ones or merge over-split fields (see Approach B for merge technique).
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Promote first row to headers (if needed).</span>
+                    If the column names are <code>Column1, Column2…</code> rather than meaningful names,
+                    go to <kbd>Home</kbd> tab <span class="arrow">→</span>
+                    <strong>Use First Row as Headers</strong>.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Rename columns manually if needed.</span>
+                    Double-click each column header in the preview and rename to:
+                    <code>Customer</code>, <code>Product</code>, <code>Region</code>,
+                    <code>Amount</code>, <code>Date</code>.
+                </p>
+            </li>
+        </ol>
+
+        <h3 id="a-types">Set column data types</h3>
+
+        <ol class="steps">
+            <li>
+                <p>
+                    <span class="step-label">Customer &amp; Product — Text.</span>
+                    Click the type icon (top-left of the column header, showing <code>ABC</code>
+                    or a number icon) and choose <strong>Text</strong>.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Region — Text.</span>
+                    Same as above — set to <strong>Text</strong>.
+                    Optionally: <kbd>Transform</kbd> tab <span class="arrow">→</span>
+                    <strong>Format</strong> <span class="arrow">→</span> <strong>Capitalize Each Word</strong>
+                    to normalise casing.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Amount — Decimal Number.</span>
+                    Click the type icon <span class="arrow">→</span> <strong>Decimal Number</strong>.
+                    If values contain currency symbols (£, $), first apply
+                    <kbd>Transform</kbd> <span class="arrow">→</span> <strong>Replace Values</strong>
+                    to remove the symbol before changing the type.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Date — Date.</span>
+                    Click the type icon <span class="arrow">→</span> <strong>Date</strong>.
+                    If Power Query shows a type-conversion error, use
+                    <kbd>Transform</kbd> <span class="arrow">→</span> <strong>Data Type</strong>
+                    <span class="arrow">→</span> <strong>Using Locale</strong> and specify the
+                    correct locale (e.g. English (United Kingdom) for DD/MM/YYYY).
+                </p>
+            </li>
+        </ol>
+
+        <div class="callout success">
+            <div class="callout-title">✔ After Approach A</div>
+            Your 5 columns should now have the correct names and types.
+            Skip to <a href="#clean-up" style="color:var(--accent-green);">Step 3 — Clean Up</a>.
+        </div>
+    </section>
+
+    <hr class="guide-divider">
+
+    <!-- APPROACH B -->
+    <section class="guide-section" id="approach-b">
+        <div class="section-num">05 — Approach B</div>
+        <h2>Step 2B — Paste Landed as a Single Column</h2>
+
+        <p>
+            This is the harder case. Every row is one long string like:<br>
+            <code>John Smith&nbsp;&nbsp;&nbsp;&nbsp;Whey Powder&nbsp;&nbsp;&nbsp;North&nbsp;&nbsp;150.00&nbsp;&nbsp;2024-01-15</code>
+        </p>
+
+        <p>
+            The strategy: split aggressively on whitespace to get tokens, then use the
+            <em>known structure</em> of the last three fields (Region = one of
+            {North|South|East|West}, Amount = numeric, Date = date pattern) to anchor
+            the split — leaving the remaining tokens to reconstruct Customer and Product.
+        </p>
+
+        <h3 id="b-split">Split column by whitespace delimiter</h3>
+
+        <ol class="steps">
+            <li>
+                <p>
+                    <span class="step-label">Select the raw column.</span>
+                    Click the column header to select it.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Open Split Column dialog.</span>
+                    Go to <kbd>Home</kbd> tab <span class="arrow">→</span> <strong>Split Column</strong>
+                    <span class="arrow">→</span> <strong>By Delimiter</strong>.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Configure the split.</span>
+                    In the dialog:
+                </p>
+                <ul style="margin:0.5rem 0 0 1.2rem;font-size:0.9rem;color:var(--text-dim);">
+                    <li>Delimiter: choose <strong>Space</strong> (or type a single space in the custom field)</li>
+                    <li>Split at: <strong>Each occurrence of the delimiter</strong></li>
+                    <li>Expand <em>Advanced options</em> <span class="arrow">→</span> tick
+                        <strong>"Split into Columns"</strong></li>
+                    <li>Click <strong>OK</strong></li>
+                </ul>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Handle extra blank columns from multiple spaces.</span>
+                    Power Query creates many extra columns for each consecutive space.
+                    Select all the empty/null columns in the preview, right-click
+                    <span class="arrow">→</span> <strong>Remove Columns</strong>.
+                    Alternatively, use <kbd>Home</kbd> <span class="arrow">→</span>
+                    <strong>Remove Columns</strong> <span class="arrow">→</span>
+                    <strong>Remove Other Columns</strong> after selecting only the non-empty token columns.
+                </p>
+            </li>
+        </ol>
+
+        <div class="callout info">
+            <div class="callout-title">ℹ Tip — Split by multiple spaces at once (M formula)</div>
+            To avoid dozens of blank columns from consecutive spaces, use a custom M step instead.
+            Click the <kbd>fx</kbd> formula bar and replace the split step with:<br><br>
+            <code>= Table.SplitColumn(#"Previous Step", "RawData",
+  Splitter.SplitTextByAnyDelimiter({"  ", " "}, QuoteStyle.None))</code><br><br>
+            Or, even cleaner — first <strong>Trim</strong> the column
+            (<kbd>Transform</kbd> <span class="arrow">→</span> <strong>Format</strong>
+            <span class="arrow">→</span> <strong>Trim</strong>) to collapse runs of spaces,
+            then split on a single space.
+        </div>
+
+        <h3 id="b-identify">Identify the anchor tokens (Region, Amount, Date)</h3>
+
+        <p>
+            After splitting you have columns like <code>Token.1</code>, <code>Token.2</code> …
+            <code>Token.N</code>. The <em>last three tokens</em> in each row are always
+            Date, Amount, Region (reading right-to-left), regardless of how many words are
+            in the Customer or Product names.
+        </p>
+
+        <ol class="steps">
+            <li>
+                <p>
+                    <span class="step-label">Rename the last three token columns.</span>
+                    Scroll to the rightmost token columns.
+                    Double-click and rename: last column <span class="arrow">→</span> <code>Date</code>,
+                    second-to-last <span class="arrow">→</span> <code>Amount</code>,
+                    third-to-last <span class="arrow">→</span> <code>Region</code>.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Verify Region values.</span>
+                    Click the Region column drop-down filter and confirm values are only
+                    North, South, East, West (no stray words). If a row's Region column
+                    contains a non-region word, your token count is off for that row —
+                    see the troubleshooting note below.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Verify Amount values.</span>
+                    Set Amount column type to <strong>Decimal Number</strong>.
+                    Rows with type errors indicate the token split is misaligned for those rows.
+                </p>
+            </li>
+        </ol>
+
+        <div class="callout warning">
+            <div class="callout-title">⚠ Troubleshooting misaligned rows</div>
+            If some rows have the wrong value in the Region column, it usually means one of
+            the Customer or Product names has an unexpected number of words.
+            Fix by adding a <strong>Conditional Column</strong>
+            (<kbd>Add Column</kbd> <span class="arrow">→</span> <strong>Conditional Column</strong>)
+            that checks whether the candidate Region token is in {"North","South","East","West"};
+            if not, shift your token window by one.
+        </div>
+
+        <h3 id="b-recombine">Recombine remaining tokens into Customer and Product</h3>
+
+        <p>
+            The remaining columns to the <em>left</em> of Region are the Customer and Product tokens.
+            With both names being exactly two words each, this is columns 1–2 (Customer)
+            and columns 3–4 (Product). If field widths vary, use the rule-based approach below.
+        </p>
+
+        <h4>When Customer and Product are always exactly two words each</h4>
+
+        <ol class="steps">
+            <li>
+                <p>
+                    <span class="step-label">Merge Customer tokens.</span>
+                    Select <code>Token.1</code> and <code>Token.2</code> (hold <kbd>Ctrl</kbd> and click both).
+                    Go to <kbd>Add Column</kbd> tab <span class="arrow">→</span>
+                    <strong>Merge Columns</strong>.
+                    Separator: <strong>Space</strong>. New column name: <code>Customer</code>. Click <strong>OK</strong>.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Merge Product tokens.</span>
+                    Select <code>Token.3</code> and <code>Token.4</code>. Repeat Merge Columns with
+                    separator Space. Name: <code>Product</code>.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Remove the original token columns.</span>
+                    Select all remaining <code>Token.N</code> columns, right-click
+                    <span class="arrow">→</span> <strong>Remove Columns</strong>.
+                </p>
+            </li>
+        </ol>
+
+        <h4>Rule-based approach — when field widths are variable</h4>
+
+        <p>
+            If Customer might be one or three words and Product might be one or two words,
+            use a custom M column to find the Product boundary using the known Region anchor:
+        </p>
+
+        <pre><span class="comment">// Custom Column: extract everything left of Region as a combined string</span>
+<span class="comment">// Add Column → Custom Column → paste this formula:</span>
+
+<span class="kw">let</span>
+    rawTokens  = Text.Split(Text.Trim([RawData]), " "),
+    <span class="comment">// known anchors: last 3 tokens are Region, Amount, Date</span>
+    numTokens  = List.Count(rawTokens),
+    leftTokens = List.FirstN(rawTokens, numTokens - 3),
+    <span class="comment">// find the Product boundary: scan left-to-right, Product ends just before Region</span>
+    <span class="comment">// heuristic: Product = last two tokens before Region (adjust if needed)</span>
+    prodStart  = List.Count(leftTokens) - 2,
+    custTokens = List.FirstN(leftTokens, prodStart),
+    prodTokens = List.LastN(leftTokens, 2)
+<span class="kw">in</span>
+    [ Customer = Text.Combine(custTokens, " "),
+      Product  = Text.Combine(prodTokens, " ") ]</pre>
+
+        <div class="callout info">
+            <div class="callout-title">ℹ Extracting the Record fields</div>
+            The formula above returns a <em>Record</em>. After adding it as a custom column,
+            click the expand icon (⇲) in the new column header and select
+            <strong>Customer</strong> and <strong>Product</strong> to unpack them into two columns.
+        </div>
+
+        <p>
+            An alternative GUI-only approach using the <em>Extract</em> feature:
+        </p>
+
+        <ol class="steps">
+            <li>
+                <p>
+                    <span class="step-label">Add a helper "LeftOfRegion" column.</span>
+                    <kbd>Add Column</kbd> <span class="arrow">→</span> <strong>Extract</strong>
+                    <span class="arrow">→</span> <strong>Text Before Delimiter</strong>.
+                    Delimiter: the Region value (e.g. <code> North</code> with a leading space).
+                    Because the Region is different per row, use a Custom Column formula instead:
+                    <code>Text.BeforeDelimiter([RawData], " " &amp; [Region])</code>.
+                    Name it <code>CustomerProduct</code>.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Split CustomerProduct by the last space.</span>
+                    Select <code>CustomerProduct</code> <span class="arrow">→</span>
+                    <kbd>Split Column</kbd> <span class="arrow">→</span>
+                    <strong>By Number of Characters</strong> — or use the M formula:
+                    <code>Text.BeforeDelimiter([CustomerProduct], " ", {0, RelativePosition.FromEnd})</code>
+                    for Customer, and
+                    <code>Text.AfterDelimiter([CustomerProduct], " ", {0, RelativePosition.FromEnd})</code>
+                    for Product (when Product is one word).
+                    For two-word Product names split from the end twice.
+                </p>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="guide-divider">
+
+    <!-- CLEAN UP -->
+    <section class="guide-section" id="clean-up">
+        <div class="section-num">06 — Cleaning</div>
+        <h2>Step 3 — Clean Up: Blanks, Trim, Case, Types</h2>
+
+        <p>Apply these transformations to the full table once you have your 5 columns.</p>
+
+        <h3>Remove blank and "(blank)" rows</h3>
+
+        <ol class="steps">
+            <li>
+                <p>
+                    <span class="step-label">Filter out fully blank rows.</span>
+                    Click the drop-down on the <code>Customer</code> column.
+                    Untick <strong>(null)</strong> and <strong>(blank)</strong>.
+                    Click <strong>OK</strong>.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Remove rows where Customer is the literal text "(blank)".</span>
+                    <kbd>Home</kbd> <span class="arrow">→</span> <strong>Remove Rows</strong>
+                    <span class="arrow">→</span> <strong>Remove Blank Rows</strong>
+                    handles nulls. For literal <code>"(blank)"</code> strings, use
+                    <kbd>Home</kbd> <span class="arrow">→</span> <strong>Replace Values</strong>:
+                    replace <code>(blank)</code> with <em>nothing</em> (leave "Replace With" empty),
+                    then use <strong>Remove Blank Rows</strong> again.
+                </p>
+            </li>
+        </ol>
+
+        <h3>Trim &amp; Clean whitespace</h3>
+
+        <ol class="steps">
+            <li>
+                <p>
+                    <span class="step-label">Select all text columns</span>
+                    (Customer, Product, Region). Hold <kbd>Ctrl</kbd> and click each header.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Apply Trim.</span>
+                    <kbd>Transform</kbd> tab <span class="arrow">→</span>
+                    <strong>Format</strong> <span class="arrow">→</span> <strong>Trim</strong>.
+                    This removes leading and trailing spaces.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Apply Clean.</span>
+                    With the same columns still selected:
+                    <kbd>Transform</kbd> <span class="arrow">→</span>
+                    <strong>Format</strong> <span class="arrow">→</span> <strong>Clean</strong>.
+                    This removes non-printable characters (common in pasted text).
+                </p>
+            </li>
+        </ol>
+
+        <h3>Standardise text case</h3>
+
+        <ol class="steps">
+            <li>
+                <p>
+                    <span class="step-label">Customer &amp; Product — Capitalize Each Word.</span>
+                    Select the Customer and Product columns.
+                    <kbd>Transform</kbd> <span class="arrow">→</span> <strong>Format</strong>
+                    <span class="arrow">→</span> <strong>Capitalize Each Word</strong>.
+                    This ensures "john smith" becomes "John Smith".
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Region — Capitalize Each Word.</span>
+                    Same steps for Region to normalise "north" → "North".
+                </p>
+            </li>
+        </ol>
+
+        <h3>Convert Amount to a number</h3>
+
+        <ol class="steps">
+            <li>
+                <p>
+                    <span class="step-label">Remove currency symbols if present.</span>
+                    Select the Amount column.
+                    <kbd>Transform</kbd> <span class="arrow">→</span> <strong>Replace Values</strong>.
+                    "Value to Find": <code>£</code> (or <code>$</code>).
+                    "Replace With": leave empty. Click <strong>OK</strong>.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Remove commas (thousands separators) if present.</span>
+                    Repeat Replace Values: find <code>,</code> → replace with nothing.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Change type to Decimal Number.</span>
+                    Click the type icon on the Amount column header
+                    <span class="arrow">→</span> <strong>Decimal Number</strong>.
+                    Check for red error markers — click into any error to see the offending value.
+                </p>
+            </li>
+        </ol>
+
+        <h3>Parse dates</h3>
+
+        <ol class="steps">
+            <li>
+                <p>
+                    <span class="step-label">Change type to Date.</span>
+                    Click the Date column's type icon <span class="arrow">→</span>
+                    <strong>Date</strong>. Power Query detects ISO 8601 (YYYY-MM-DD) automatically.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">For non-ISO formats (e.g. DD/MM/YYYY).</span>
+                    Right-click the Date column header <span class="arrow">→</span>
+                    <strong>Change Type</strong> <span class="arrow">→</span>
+                    <strong>Using Locale</strong>.
+                    Data Type: <strong>Date</strong>.
+                    Locale: <strong>English (United Kingdom)</strong> for DD/MM/YYYY.
+                    Click <strong>OK</strong>.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Extract date parts (optional).</span>
+                    With Date column selected: <kbd>Add Column</kbd>
+                    <span class="arrow">→</span> <strong>Date</strong>
+                    <span class="arrow">→</span> <strong>Year</strong> / <strong>Month</strong>
+                    / <strong>Day</strong> — useful for pivot tables or further grouping.
+                </p>
+            </li>
+        </ol>
+
+        <div class="callout success">
+            <div class="callout-title">✔ Checkpoint</div>
+            At this point your Applied Steps pane should list something like:
+            Source → Promoted Headers → Changed Type → Filtered Rows → Trimmed Text →
+            Cleaned Text → Capitalised Text → Replaced £ → Changed Type (Amount) →
+            Changed Type (Date). Each step is undoable — click any step to review its output.
+        </div>
+    </section>
+
+    <hr class="guide-divider">
+
+    <!-- CLOSE & LOAD -->
+    <section class="guide-section" id="close-load">
+        <div class="section-num">07 — Finish</div>
+        <h2>Step 4 — Close &amp; Load to a New Worksheet</h2>
+
+        <ol class="steps">
+            <li>
+                <p>
+                    <span class="step-label">Review the final preview.</span>
+                    In the Power Query Editor, scroll through the data preview to confirm
+                    all 5 columns look correct, no stray null rows remain, and types show
+                    the correct icons (ABC for text, 1.2 for decimal, 📅 for date).
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Rename the query (optional but recommended).</span>
+                    In the <em>Query Settings</em> pane on the right, change "Name" from
+                    <code>Table1</code> to something descriptive like <code>SalesData_Clean</code>.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Close &amp; Load.</span>
+                    Click <kbd>Home</kbd> tab in Power Query
+                    <span class="arrow">→</span> <strong>Close &amp; Load</strong> drop-down
+                    <span class="arrow">→</span> <strong>Close &amp; Load To…</strong>.
+                </p>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Choose destination.</span>
+                    In the "Import Data" dialog:
+                </p>
+                <ul style="margin:0.5rem 0 0 1.2rem;font-size:0.9rem;color:var(--text-dim);">
+                    <li>Select <strong>Table</strong> (not PivotTable or Connection Only)</li>
+                    <li>Select <strong>New worksheet</strong></li>
+                    <li>Click <strong>OK</strong></li>
+                </ul>
+            </li>
+            <li>
+                <p>
+                    <span class="step-label">Verify the output sheet.</span>
+                    Excel creates a new worksheet (e.g. <em>Sheet2</em>) with an Excel Table
+                    containing your 5 clean columns. The table is linked to the Power Query —
+                    right-click anywhere in it and choose <strong>Refresh</strong> to re-run
+                    all steps whenever the source data changes.
+                </p>
+            </li>
+        </ol>
+
+        <div class="callout info">
+            <div class="callout-title">ℹ Refreshing automatically</div>
+            To refresh on file open: go to <kbd>Data</kbd> tab
+            <span class="arrow">→</span> <strong>Queries &amp; Connections</strong>,
+            right-click your query <span class="arrow">→</span> <strong>Properties</strong>
+            <span class="arrow">→</span> tick <strong>"Refresh data when opening the file"</strong>.
+        </div>
+    </section>
+
+    <hr class="guide-divider">
+
+    <!-- CHEAT SHEET -->
+    <section class="guide-section" id="cheatsheet">
+        <div class="section-num">08 — Reference</div>
+        <h2>Quick Reference Cheat Sheet</h2>
+
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>Power Query menu path</th>
+                        <th>Key M function</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Load from worksheet</td>
+                        <td>Data → From Table/Range</td>
+                        <td><code>Excel.CurrentWorkbook()</code></td>
+                    </tr>
+                    <tr>
+                        <td>Promote first row as headers</td>
+                        <td>Home → Use First Row as Headers</td>
+                        <td><code>Table.PromoteHeaders()</code></td>
+                    </tr>
+                    <tr>
+                        <td>Split by delimiter</td>
+                        <td>Home → Split Column → By Delimiter</td>
+                        <td><code>Table.SplitColumn(…, Splitter.SplitTextByDelimiter(" "))</code></td>
+                    </tr>
+                    <tr>
+                        <td>Merge columns</td>
+                        <td>Add Column → Merge Columns</td>
+                        <td><code>Table.CombineColumns(…, Combiner.CombineTextByDelimiter(" "))</code></td>
+                    </tr>
+                    <tr>
+                        <td>Extract text before delimiter</td>
+                        <td>Add Column → Extract → Text Before Delimiter</td>
+                        <td><code>Text.BeforeDelimiter([col], " delimiter")</code></td>
+                    </tr>
+                    <tr>
+                        <td>Remove blank rows</td>
+                        <td>Home → Remove Rows → Remove Blank Rows</td>
+                        <td><code>Table.SelectRows(…, each [Customer] &lt;&gt; null)</code></td>
+                    </tr>
+                    <tr>
+                        <td>Trim whitespace</td>
+                        <td>Transform → Format → Trim</td>
+                        <td><code>Table.TransformColumns(…, {{"col", Text.Trim}})</code></td>
+                    </tr>
+                    <tr>
+                        <td>Remove non-printable chars</td>
+                        <td>Transform → Format → Clean</td>
+                        <td><code>Table.TransformColumns(…, {{"col", Text.Clean}})</code></td>
+                    </tr>
+                    <tr>
+                        <td>Capitalize each word</td>
+                        <td>Transform → Format → Capitalize Each Word</td>
+                        <td><code>Text.Proper([col])</code></td>
+                    </tr>
+                    <tr>
+                        <td>Replace value in column</td>
+                        <td>Transform → Replace Values</td>
+                        <td><code>Table.ReplaceValue(…, "£", "", Replacer.ReplaceText, {"Amount"})</code></td>
+                    </tr>
+                    <tr>
+                        <td>Change to Decimal Number</td>
+                        <td>Click type icon → Decimal Number</td>
+                        <td><code>Table.TransformColumnTypes(…, {{"Amount", type number}})</code></td>
+                    </tr>
+                    <tr>
+                        <td>Parse date with locale</td>
+                        <td>Right-click → Change Type → Using Locale</td>
+                        <td><code>Table.TransformColumnTypes(…, {{"Date", type date}}, "en-GB")</code></td>
+                    </tr>
+                    <tr>
+                        <td>Close &amp; Load to new sheet</td>
+                        <td>Home → Close &amp; Load → Close &amp; Load To…</td>
+                        <td><em>(UI only — no M equivalent)</em></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="finish-box">
+            <h3>🎯 You now have a repeatable, refreshable cleaning pipeline</h3>
+            <p>
+                Every transformation is recorded as a step in the Applied Steps pane.
+                When the source data changes, simply hit <strong>Refresh</strong> and Power Query
+                re-runs the full pipeline — no manual re-cleaning needed.
+                <br><br>
+                Next step: connect this clean table to a <strong>PivotTable</strong> or
+                <strong>Power BI</strong> for visualisation.
+            </p>
+        </div>
+    </section>
+
+</main>
+
+</body>
+</html>
