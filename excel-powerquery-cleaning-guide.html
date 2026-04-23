@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel & Power Query — Data Cleaning Guide | Jai Kishan Pal</title>
+    <meta name="description" content="Step-by-step guide to cleaning pasted data in Excel and preparing it for Power Query — avoiding blank columns, trimming delimiters, and troubleshooting common issues.">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #0a0e1a;
+            --navy-light: #111827;
+            --navy-mid: #1a2332;
+            --gold: #c9a84c;
+            --gold-light: #e4c76b;
+            --gold-dim: rgba(201, 168, 76, 0.15);
+            --text: #e8e6e3;
+            --text-dim: #8a9bb5;
+            --text-muted: #4a5568;
+            --accent-blue: #2563eb;
+            --accent-green: #10B981;
+            --accent-red: #ef4444;
+            --accent-amber: #f59e0b;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.06);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--gold) var(--navy); }
+        body { font-family: 'DM Sans', sans-serif; background: var(--navy); color: var(--text); line-height: 1.7; overflow-x: hidden; }
+
+        /* NAV */
+        nav { position: sticky; top: 0; left: 0; right: 0; z-index: 1000; padding: 1rem 3rem; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(20px); background: rgba(10, 14, 26, 0.9); border-bottom: 1px solid var(--glass-border); }
+        .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--gold); letter-spacing: 1px; text-decoration: none; }
+        .nav-logo span { color: var(--text); font-weight: 400; }
+        .nav-back { display: inline-flex; align-items: center; gap: 7px; color: var(--text-dim); text-decoration: none; font-size: 0.82rem; font-weight: 500; transition: color 0.2s; }
+        .nav-back:hover { color: var(--gold); }
+        .nav-back svg { width: 15px; height: 15px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* HERO */
+        .guide-hero { padding: 4rem 3rem 3rem; max-width: 900px; margin: 0 auto; }
+        .guide-badge { display: inline-flex; align-items: center; gap: 8px; padding: 5px 14px; background: var(--gold-dim); border: 1px solid rgba(201, 168, 76, 0.2); border-radius: 100px; font-size: 0.72rem; font-weight: 600; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 1.5rem; font-family: 'JetBrains Mono', monospace; }
+        .guide-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.9rem, 4vw, 2.8rem); font-weight: 700; line-height: 1.2; margin-bottom: 1rem; }
+        .guide-hero h1 .accent { color: var(--gold); }
+        .guide-hero .subtitle { font-size: 1rem; color: var(--text-dim); max-width: 700px; font-weight: 300; line-height: 1.8; margin-bottom: 2rem; }
+        .guide-meta { display: flex; gap: 1.5rem; flex-wrap: wrap; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--text-muted); border-top: 1px solid var(--glass-border); padding-top: 1.5rem; }
+        .guide-meta span { display: flex; align-items: center; gap: 5px; }
+        .guide-meta svg { width: 13px; height: 13px; stroke: var(--gold); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* TABLE OF CONTENTS */
+        .toc { max-width: 900px; margin: 0 auto 2rem; padding: 0 3rem; }
+        .toc-box { background: rgba(201, 168, 76, 0.04); border: 1px solid rgba(201, 168, 76, 0.15); border-radius: 14px; padding: 1.75rem 2rem; }
+        .toc-title { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 1rem; }
+        .toc-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 2rem; }
+        .toc-list li a { color: var(--text-dim); text-decoration: none; font-size: 0.88rem; display: flex; align-items: center; gap: 7px; transition: color 0.2s; }
+        .toc-list li a:hover { color: var(--gold); }
+        .toc-num { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--gold); min-width: 20px; }
+
+        /* MAIN CONTENT */
+        .guide-content { max-width: 900px; margin: 0 auto; padding: 0 3rem 5rem; }
+
+        /* SECTIONS */
+        .guide-section { margin-bottom: 4rem; }
+        .section-anchor { display: block; position: relative; top: -90px; visibility: hidden; }
+        .section-label-guide { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 7px; }
+        .section-label-guide svg { width: 13px; height: 13px; stroke: var(--gold); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        .guide-section h2 { font-family: 'Playfair Display', serif; font-size: 1.65rem; font-weight: 700; line-height: 1.3; margin-bottom: 1.25rem; }
+        .guide-section h2 .accent { color: var(--gold); }
+        .guide-section p { color: var(--text-dim); font-size: 0.95rem; line-height: 1.85; margin-bottom: 1rem; }
+        .guide-section p strong { color: var(--text); }
+
+        /* STEP CARDS */
+        .steps { display: flex; flex-direction: column; gap: 1.25rem; margin: 1.5rem 0; }
+        .step { display: flex; gap: 1.25rem; align-items: flex-start; padding: 1.5rem; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 12px; transition: border-color 0.3s; }
+        .step:hover { border-color: rgba(201, 168, 76, 0.2); }
+        .step-num { width: 36px; height: 36px; min-width: 36px; border-radius: 50%; background: var(--gold-dim); border: 1px solid rgba(201, 168, 76, 0.2); display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 600; color: var(--gold); margin-top: 2px; }
+        .step-content h4 { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
+        .step-content p { font-size: 0.875rem; color: var(--text-dim); line-height: 1.75; margin: 0; }
+        .step-content p strong { color: var(--text); }
+        .step.best { border-color: rgba(16, 185, 129, 0.2); background: rgba(16, 185, 129, 0.03); }
+        .step.best .step-num { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2); color: var(--accent-green); }
+
+        /* CODE / SHORTCUT BLOCKS */
+        .shortcut-row { display: flex; align-items: center; gap: 10px; margin: 0.6rem 0; }
+        .kbd { display: inline-flex; align-items: center; gap: 5px; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; padding: 4px 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; color: var(--text); white-space: nowrap; }
+        .kbd + .kbd-sep { color: var(--text-muted); font-size: 0.8rem; }
+        .shortcut-desc { font-size: 0.85rem; color: var(--text-dim); }
+
+        /* CALLOUT BOXES */
+        .callout { border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1.25rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+        .callout.tip { background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .callout.warning { background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .callout.danger { background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .callout.info { background: rgba(37, 99, 235, 0.05); border: 1px solid rgba(37, 99, 235, 0.2); }
+        .callout-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+        .callout-body { flex: 1; }
+        .callout-title { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 0.35rem; font-family: 'JetBrains Mono', monospace; }
+        .callout.tip .callout-title { color: var(--accent-green); }
+        .callout.warning .callout-title { color: var(--accent-amber); }
+        .callout.danger .callout-title { color: var(--accent-red); }
+        .callout.info .callout-title { color: #60a5fa; }
+        .callout p { font-size: 0.875rem; color: var(--text-dim); line-height: 1.7; margin: 0; }
+        .callout p strong { color: var(--text); }
+
+        /* TABLE */
+        .guide-table-wrap { overflow-x: auto; margin: 1.5rem 0; border-radius: 12px; border: 1px solid var(--glass-border); }
+        .guide-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        .guide-table th { padding: 0.9rem 1.25rem; background: rgba(201, 168, 76, 0.06); color: var(--gold); font-weight: 600; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid rgba(201, 168, 76, 0.15); }
+        .guide-table td { padding: 0.85rem 1.25rem; color: var(--text-dim); border-bottom: 1px solid var(--glass-border); vertical-align: top; line-height: 1.65; }
+        .guide-table tr:last-child td { border-bottom: none; }
+        .guide-table tr:hover td { background: rgba(255,255,255,0.015); }
+        .guide-table td strong { color: var(--text); }
+        .badge-yes { display: inline-block; padding: 2px 9px; border-radius: 100px; font-size: 0.7rem; font-weight: 600; background: rgba(16,185,129,0.1); color: var(--accent-green); border: 1px solid rgba(16,185,129,0.2); font-family: 'JetBrains Mono', monospace; }
+        .badge-no { display: inline-block; padding: 2px 9px; border-radius: 100px; font-size: 0.7rem; font-weight: 600; background: rgba(239,68,68,0.1); color: var(--accent-red); border: 1px solid rgba(239,68,68,0.2); font-family: 'JetBrains Mono', monospace; }
+        .badge-maybe { display: inline-block; padding: 2px 9px; border-radius: 100px; font-size: 0.7rem; font-weight: 600; background: rgba(245,158,11,0.1); color: var(--accent-amber); border: 1px solid rgba(245,158,11,0.2); font-family: 'JetBrains Mono', monospace; }
+
+        /* TROUBLESHOOT */
+        .trouble-list { display: flex; flex-direction: column; gap: 1.25rem; margin: 1.5rem 0; }
+        .trouble-item { border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.15); background: rgba(239, 68, 68, 0.03); overflow: hidden; }
+        .trouble-header { padding: 1rem 1.5rem; display: flex; align-items: flex-start; gap: 0.75rem; }
+        .trouble-icon { font-size: 1.1rem; margin-top: 1px; }
+        .trouble-header-text h4 { font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.2rem; }
+        .trouble-header-text p { font-size: 0.82rem; color: #f87171; margin: 0; }
+        .trouble-fix { padding: 1rem 1.5rem; background: rgba(16, 185, 129, 0.03); border-top: 1px solid rgba(255,255,255,0.04); }
+        .trouble-fix-label { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-green); margin-bottom: 0.5rem; }
+        .trouble-fix p { font-size: 0.875rem; color: var(--text-dim); margin: 0; line-height: 1.7; }
+        .trouble-fix p strong { color: var(--text); }
+
+        /* CHECKLIST */
+        .checklist { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; margin: 1.25rem 0; }
+        .checklist li { display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.9rem; color: var(--text-dim); line-height: 1.6; }
+        .checklist li::before { content: '✓'; color: var(--accent-green); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+        .checklist li.warn::before { content: '⚠'; color: var(--accent-amber); }
+        .checklist li strong { color: var(--text); }
+
+        /* SECTION DIVIDER */
+        .section-divider { border: none; border-top: 1px solid var(--glass-border); margin: 3rem 0; }
+
+        /* BACK TO TOP */
+        .back-to-top { display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); text-decoration: none; font-size: 0.82rem; font-family: 'JetBrains Mono', monospace; transition: color 0.2s; margin-top: 1rem; }
+        .back-to-top:hover { color: var(--gold); }
+        .back-to-top svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* RESPONSIVE */
+        @media (max-width: 700px) {
+            nav { padding: 0.9rem 1.25rem; }
+            .guide-hero, .toc, .guide-content { padding-left: 1.25rem; padding-right: 1.25rem; }
+            .toc-list { grid-template-columns: 1fr; }
+            .guide-meta { gap: 1rem; }
+        }
+    </style>
+</head>
+<body id="top">
+
+    <!-- NAV -->
+    <nav>
+        <a href="index.html" class="nav-logo">JKP<span> · Finance</span></a>
+        <a href="index.html" class="nav-back">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            Back to Portfolio
+        </a>
+    </nav>
+
+    <!-- HERO -->
+    <div class="guide-hero">
+        <div class="guide-badge">📋 Reference Guide</div>
+        <h1>Excel &amp; Power Query<br><span class="accent">Data Cleaning Guide</span></h1>
+        <p class="subtitle">
+            A practical, step-by-step reference for cleaning pasted data in Excel before loading it into Power Query —
+            covering safe paste methods, removing blank columns and rows, trimming trailing delimiters,
+            and troubleshooting the most common issues that cause extra columns to appear unexpectedly.
+        </p>
+        <div class="guide-meta">
+            <span><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg> Excel &amp; Power Query</span>
+            <span><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ~8 min read</span>
+            <span><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg> Data Cleaning · Best Practices</span>
+        </div>
+    </div>
+
+    <!-- TABLE OF CONTENTS -->
+    <div class="toc">
+        <div class="toc-box">
+            <div class="toc-title">Contents</div>
+            <ul class="toc-list">
+                <li><a href="#why-blank-columns"><span class="toc-num">01</span> Why Blank Columns Appear</a></li>
+                <li><a href="#paste-best-practices"><span class="toc-num">02</span> Best Practices for Pasting</a></li>
+                <li><a href="#select-exact-range"><span class="toc-num">03</span> Selecting the Exact Used Range</a></li>
+                <li><a href="#trim-delimiters"><span class="toc-num">04</span> Trimming Trailing Delimiters</a></li>
+                <li><a href="#remove-empty"><span class="toc-num">05</span> Removing Empty Columns &amp; Rows</a></li>
+                <li><a href="#convert-to-table"><span class="toc-num">06</span> Converting to an Excel Table Safely</a></li>
+                <li><a href="#troubleshooting"><span class="toc-num">07</span> Troubleshooting</a></li>
+                <li><a href="#quick-checklist"><span class="toc-num">08</span> Quick Pre-Load Checklist</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="guide-content">
+
+        <!-- ─── SECTION 1 ─── -->
+        <section class="guide-section" id="why-blank-columns">
+            <span class="section-anchor"></span>
+            <div class="section-label-guide">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                01 — Background
+            </div>
+            <h2>Why <span class="accent">Blank Columns</span> Appear</h2>
+            <p>
+                When you paste data into Excel — especially data copied from a browser, PDF, or another application —
+                Excel can silently create one or more empty columns to the right of your data. These ghost columns
+                look invisible, but Power Query detects them and imports them as unnamed columns (<strong>Column1, Column2, …</strong>),
+                which breaks query steps and causes downstream errors.
+            </p>
+            <p>The most common causes are:</p>
+
+            <div class="guide-table-wrap">
+                <table class="guide-table">
+                    <thead>
+                        <tr>
+                            <th>Root Cause</th>
+                            <th>What Happens in Excel</th>
+                            <th>Blank Cols?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Pasting with formatting</strong></td>
+                            <td>Clipboard includes invisible trailing whitespace or tab characters from the source app</td>
+                            <td><span class="badge-yes">Yes</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Trailing delimiters / tabs</strong></td>
+                            <td>CSV or TSV data with a delimiter at the end of each row creates an extra empty field</td>
+                            <td><span class="badge-yes">Yes</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Multiple consecutive spaces</strong></td>
+                            <td>Excel may split on spaces if Text-to-Columns is used with space as delimiter</td>
+                            <td><span class="badge-yes">Yes</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Selecting entire columns</strong></td>
+                            <td>If you select column A:Z instead of only used cells, every empty column is included in the Table range</td>
+                            <td><span class="badge-yes">Yes</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Paste Special → Values only</strong></td>
+                            <td>Strips formatting but does not strip tab/space characters embedded in the text</td>
+                            <td><span class="badge-maybe">Maybe</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Paste via Notepad (clean text)</strong></td>
+                            <td>Notepad strips rich-text formatting; only plain text is transferred to clipboard</td>
+                            <td><span class="badge-no">Rarely</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout info">
+                <div class="callout-icon">ℹ️</div>
+                <div class="callout-body">
+                    <div class="callout-title">Key Point</div>
+                    <p>Power Query reads the <strong>Table range</strong> or the <strong>Used Range</strong> of a sheet exactly as Excel reports it. If Excel thinks column F is used (even if it just holds a space character), Power Query will include it.</p>
+                </div>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <!-- ─── SECTION 2 ─── -->
+        <section class="guide-section" id="paste-best-practices">
+            <span class="section-anchor"></span>
+            <div class="section-label-guide">
+                <svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                02 — Best Practices
+            </div>
+            <h2>Best Practices for <span class="accent">Pasting Data</span></h2>
+            <p>
+                The safest approach is to strip all rich-text formatting <em>before</em> the data reaches Excel.
+                Two methods reliably achieve this:
+            </p>
+
+            <div class="steps">
+                <div class="step best">
+                    <div class="step-num">A</div>
+                    <div class="step-content">
+                        <h4>Method A — Paste via Notepad (Recommended)</h4>
+                        <p>
+                            Copy your data from the source (<strong>Ctrl + C</strong>), open Notepad
+                            (<strong>Win + R</strong> → type <strong>notepad</strong> → Enter), paste with
+                            <strong>Ctrl + V</strong>, then copy again from Notepad (<strong>Ctrl + A</strong> →
+                            <strong>Ctrl + C</strong>), and finally paste into Excel. Notepad strips all formatting,
+                            leaving only plain text — this eliminates most hidden characters.
+                        </p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">B</div>
+                    <div class="step-content">
+                        <h4>Method B — Paste Special → Text / Values</h4>
+                        <p>
+                            In Excel, instead of <strong>Ctrl + V</strong>, use <strong>Ctrl + Alt + V</strong>
+                            (or Home → Paste → Paste Special), then choose <strong>"Text"</strong>
+                            (or "Unicode Text" / "Values"). This prevents Excel from importing hidden styles from the
+                            clipboard. Note: this does not remove embedded tab or space characters within the data itself.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="callout tip">
+                <div class="callout-icon">💡</div>
+                <div class="callout-body">
+                    <div class="callout-title">Pro Tip</div>
+                    <p>For recurring data imports, consider saving the source as a <strong>.csv file</strong> and importing it directly into Power Query via <strong>Get Data → From Text/CSV</strong>. Power Query handles the delimiter parsing correctly and avoids the clipboard entirely.</p>
+                </div>
+            </div>
+
+            <div class="callout warning">
+                <div class="callout-icon">⚠️</div>
+                <div class="callout-body">
+                    <div class="callout-title">Common Mistake</div>
+                    <p><strong>Do not use "Paste Special → Keep Source Formatting"</strong> when the source is a browser table or PDF. These sources embed invisible tab stops and line breaks that will create phantom columns in Excel.</p>
+                </div>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <!-- ─── SECTION 3 ─── -->
+        <section class="guide-section" id="select-exact-range">
+            <span class="section-anchor"></span>
+            <div class="section-label-guide">
+                <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                03 — Range Selection
+            </div>
+            <h2>Selecting the <span class="accent">Exact Used Range</span></h2>
+            <p>
+                When you convert a block of cells to an Excel Table, Excel uses the selection you made — not just
+                the cells that contain visible data. If you selected full columns (e.g. A:E) or accidentally included
+                empty columns, those columns become part of the Table.
+            </p>
+            <p><strong>Correct approach:</strong></p>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-content">
+                        <h4>Click a single cell inside your data block</h4>
+                        <p>Do not pre-select a large range. Excel can detect the data boundary automatically when you insert a Table from a single cell within the data.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-content">
+                        <h4>Use Ctrl + End to verify the last used cell</h4>
+                        <p>Press <strong>Ctrl + End</strong> — Excel jumps to the last cell in the Used Range. If this lands far to the right of your data (e.g. column Z when your data ends at column E), there are stray characters in those extra columns. <strong>Delete them before creating your Table.</strong></p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-content">
+                        <h4>If inserting a Table, let Excel auto-detect or select precisely</h4>
+                        <p>Press <strong>Ctrl + T</strong> with the cursor inside a data cell. Excel will highlight the contiguous block. <strong>Verify the selection boundary in the dialog</strong> before clicking OK. Adjust if it includes extra columns.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="callout danger">
+                <div class="callout-icon">🚫</div>
+                <div class="callout-body">
+                    <div class="callout-title">Never Do This</div>
+                    <p><strong>Do not select entire columns</strong> (e.g. clicking column headers A, B, C) when creating a Table. This makes the Table range include every row in the spreadsheet — over 1 million rows — and will include all empty columns in that column range in Power Query.</p>
+                </div>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <!-- ─── SECTION 4 ─── -->
+        <section class="guide-section" id="trim-delimiters">
+            <span class="section-anchor"></span>
+            <div class="section-label-guide">
+                <svg viewBox="0 0 24 24"><path d="M6 3v12"/><path d="M18 9a3 3 0 100-6 3 3 0 000 6z"/><path d="M6 21a3 3 0 100-6 3 3 0 000 6z"/><path d="M15 6H9a6 6 0 000 12h3"/><path d="M18 16.1V21l2-1"/><path d="M18 16.1V21l-2-1"/></svg>
+                04 — Delimiters
+            </div>
+            <h2>Trimming <span class="accent">Trailing Delimiters</span></h2>
+            <p>
+                If your source data is comma-separated (CSV) or tab-separated (TSV), rows that end with a
+                trailing delimiter — for example <code style="font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--gold);background:rgba(201,168,76,0.08);padding:1px 6px;border-radius:4px;">John,Smith,100,</code> — will produce an
+                extra empty column when parsed. The trailing comma or tab tells the parser
+                "there is one more field after this" — even though that field is empty.
+            </p>
+
+            <p><strong>Before pasting into Excel, clean the source text:</strong></p>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-content">
+                        <h4>Inspect and strip trailing commas / tabs in Notepad or a text editor</h4>
+                        <p>Open the source file in Notepad++ or VS Code. Use <strong>Find &amp; Replace</strong> with a regular-expression pattern to strip trailing delimiters before copying. For trailing commas: find <code style="font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--gold);">,\s*$</code> (regex mode) and replace with nothing.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-content">
+                        <h4>Or: use Excel's Text-to-Columns to control delimiter parsing</h4>
+                        <p>
+                            Paste the raw text into a single Excel column first, then use
+                            <strong>Data → Text to Columns</strong>. In the wizard, choose your delimiter. Do <strong>not</strong> tick "Treat consecutive delimiters as one" unless your data is space-delimited — that setting hides the problem rather than fixing it.
+                        </p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-content">
+                        <h4>Or: use Power Query's own delimiter handling</h4>
+                        <p>
+                            If importing a CSV via <strong>Get Data → From Text/CSV</strong>, Power Query shows a
+                            preview. If you see an unnamed column at the right, go to <strong>Transform → Remove Columns</strong>
+                            and remove it in Power Query Editor rather than in Excel. This is cleaner for repeatable refreshes.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <!-- ─── SECTION 5 ─── -->
+        <section class="guide-section" id="remove-empty">
+            <span class="section-anchor"></span>
+            <div class="section-label-guide">
+                <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                05 — Empty Cells
+            </div>
+            <h2>Removing <span class="accent">Empty Columns &amp; Rows</span></h2>
+            <p>
+                Before you open Power Query, empty columns and rows should be removed from your Excel sheet.
+                Even a single space character in an otherwise blank column is enough for Excel to include it in the Used Range.
+            </p>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-content">
+                        <h4>Find and delete blank columns to the right of your data</h4>
+                        <p>
+                            Select the column immediately to the right of your last data column.
+                            Hold <strong>Ctrl + Shift + Right Arrow</strong> to extend the selection to the last column (XFD).
+                            Right-click → <strong>Delete</strong>. This removes all columns to the right,
+                            resetting the Used Range boundary.
+                        </p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-content">
+                        <h4>Find and delete blank rows below your data</h4>
+                        <p>
+                            Select the row immediately below your last data row.
+                            Hold <strong>Ctrl + Shift + Down Arrow</strong> to extend to row 1&nbsp;048&nbsp;576.
+                            Right-click → <strong>Delete</strong>. Then save the file — this forces Excel to
+                            recalculate the Used Range.
+                        </p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-content">
+                        <h4>Save and recheck with Ctrl + End</h4>
+                        <p>
+                            Press <strong>Ctrl + S</strong> to save, then press <strong>Ctrl + End</strong> again.
+                            If it still jumps beyond your data, there are cells with space characters.
+                            Select those columns/rows, press <strong>Delete</strong> (not Backspace), then save again.
+                        </p>
+                    </div>
+                </div>
+                <div class="step best">
+                    <div class="step-num">4</div>
+                    <div class="step-content">
+                        <h4>Optional: use Find &amp; Select to catch hidden spaces</h4>
+                        <p>
+                            Go to <strong>Home → Find &amp; Select → Go To Special → Blanks</strong>.
+                            Excel selects every blank cell in the current selection. If you see selections outside your
+                            expected data range, those cells contain nothing visible but may have whitespace.
+                            Press <strong>Delete</strong> to clear them.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="callout tip">
+                <div class="callout-icon">💡</div>
+                <div class="callout-body">
+                    <div class="callout-title">Why Save Matters</div>
+                    <p>Excel only recalculates the Used Range (<code style="font-family:'JetBrains Mono',monospace;font-size:0.82rem;">Ctrl+End</code> destination) when the workbook is <strong>saved</strong>. Deleting columns and then immediately opening Power Query without saving first may still show the old boundary.</p>
+                </div>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <!-- ─── SECTION 6 ─── -->
+        <section class="guide-section" id="convert-to-table">
+            <span class="section-anchor"></span>
+            <div class="section-label-guide">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                06 — Excel Table
+            </div>
+            <h2>Converting to an <span class="accent">Excel Table Safely</span></h2>
+            <p>
+                Converting your data to a named Excel Table (<strong>Ctrl + T</strong>) before loading into Power Query
+                gives you cleaner refresh behaviour and makes column names explicit. Follow these steps in order:
+            </p>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-content">
+                        <h4>Paste your data using Method A or B (see Section 2)</h4>
+                        <p>Start clean — use Notepad or Paste Special → Text.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-content">
+                        <h4>Remove blank columns and rows (see Section 5)</h4>
+                        <p>Do this <em>before</em> creating the Table. It is much harder to remove ghost columns after the Table is defined.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-content">
+                        <h4>Click one cell inside the data → Ctrl + T</h4>
+                        <p>In the "Create Table" dialog, verify the range shown matches your actual data range exactly. Check "My table has headers" if your first row is a header row.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">4</div>
+                    <div class="step-content">
+                        <h4>Give the Table a meaningful name</h4>
+                        <p>Click anywhere in the Table → <strong>Table Design</strong> tab → change "Table1" to something descriptive like <strong>SalesData</strong> or <strong>OrdersRaw</strong>. Power Query will reference this name, making your query easier to read and maintain.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">5</div>
+                    <div class="step-content">
+                        <h4>Save before opening Power Query</h4>
+                        <p>Press <strong>Ctrl + S</strong>. Now open Power Query via <strong>Data → Get Data → From Table/Range</strong>. You should see only the columns you expect — no unnamed extras.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="callout warning">
+                <div class="callout-icon">⚠️</div>
+                <div class="callout-body">
+                    <div class="callout-title">Column Header Tip</div>
+                    <p>Make sure every header cell in row 1 is <strong>unique and non-blank</strong>. If two columns share a name or a header is empty, Power Query will rename them automatically (e.g. <strong>Column1</strong>), which can break downstream steps.</p>
+                </div>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <!-- ─── SECTION 7 ─── -->
+        <section class="guide-section" id="troubleshooting">
+            <span class="section-anchor"></span>
+            <div class="section-label-guide">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                07 — Troubleshooting
+            </div>
+            <h2><span class="accent">Troubleshooting</span> Extra Columns</h2>
+            <p>
+                Even after careful preparation, extra columns can still appear in Power Query. Here are the most
+                common scenarios and how to fix them:
+            </p>
+
+            <div class="trouble-list">
+
+                <div class="trouble-item">
+                    <div class="trouble-header">
+                        <div class="trouble-icon">🔍</div>
+                        <div class="trouble-header-text">
+                            <h4>Problem: Power Query shows "Column1", "Column2" at the right</h4>
+                            <p>Unnamed columns appear at the end of the query, even though Excel looks clean.</p>
+                        </div>
+                    </div>
+                    <div class="trouble-fix">
+                        <div class="trouble-fix-label">✔ Fix</div>
+                        <p>
+                            Close Power Query and go back to Excel. Press <strong>Ctrl + End</strong> — if the cursor lands beyond your data, select all columns from your last data column to the cursor column, right-click, and <strong>Delete</strong>. Save (<strong>Ctrl + S</strong>) and re-open Power Query. The extra columns should be gone.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="trouble-item">
+                    <div class="trouble-header">
+                        <div class="trouble-icon">🔍</div>
+                        <div class="trouble-header-text">
+                            <h4>Problem: Extra columns appear because of multiple spaces in the data</h4>
+                            <p>Data was split using "Space" as a delimiter in Text-to-Columns, and fields with two or more consecutive spaces created blank intermediary columns.</p>
+                        </div>
+                    </div>
+                    <div class="trouble-fix">
+                        <div class="trouble-fix-label">✔ Fix</div>
+                        <p>
+                            In the Text-to-Columns wizard, check <strong>"Treat consecutive delimiters as one"</strong>. Alternatively, before splitting, use <strong>Find &amp; Replace</strong> (<strong>Ctrl + H</strong>) to replace double-spaces with a single space. Repeat until no double-spaces remain, then re-run Text-to-Columns.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="trouble-item">
+                    <div class="trouble-header">
+                        <div class="trouble-icon">🔍</div>
+                        <div class="trouble-header-text">
+                            <h4>Problem: Selecting entire columns (e.g. A:E) created the Table</h4>
+                            <p>The Excel Table range spans all rows, and Power Query includes thousands of blank rows and any empty columns in the range.</p>
+                        </div>
+                    </div>
+                    <div class="trouble-fix">
+                        <div class="trouble-fix-label">✔ Fix</div>
+                        <p>
+                            Delete the Table (<strong>Table Design → Convert to Range</strong>), then recreate it: click a <strong>single cell</strong> inside the data, press <strong>Ctrl + T</strong>, and verify the range in the dialog. <strong>Never select whole columns</strong> before pressing Ctrl + T.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="trouble-item">
+                    <div class="trouble-header">
+                        <div class="trouble-icon">🔍</div>
+                        <div class="trouble-header-text">
+                            <h4>Problem: Blank columns reappear after every paste / data refresh</h4>
+                            <p>The data source consistently includes trailing tabs or commas, so the issue recurs each time.</p>
+                        </div>
+                    </div>
+                    <div class="trouble-fix">
+                        <div class="trouble-fix-label">✔ Fix</div>
+                        <p>
+                            Handle it once in Power Query instead of Excel: in Power Query Editor, select the blank columns (hold <strong>Ctrl</strong> to select multiple), right-click → <strong>Remove Columns</strong>. This removal step runs automatically on every refresh, so you never need to clean the Excel sheet manually again.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="trouble-item">
+                    <div class="trouble-header">
+                        <div class="trouble-icon">🔍</div>
+                        <div class="trouble-header-text">
+                            <h4>Problem: Blank columns contain a single space and are invisible</h4>
+                            <p>The column looks empty but <strong>Ctrl + End</strong> still moves past it — it contains a space character.</p>
+                        </div>
+                    </div>
+                    <div class="trouble-fix">
+                        <div class="trouble-fix-label">✔ Fix</div>
+                        <p>
+                            Select the suspicious columns. Use <strong>Home → Find &amp; Select → Replace</strong> (<strong>Ctrl + H</strong>): in "Find what", type a single space; leave "Replace with" empty; click <strong>Replace All</strong>. Then delete the now-truly-empty columns and save.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="trouble-item">
+                    <div class="trouble-header">
+                        <div class="trouble-icon">🔍</div>
+                        <div class="trouble-header-text">
+                            <h4>Problem: Power Query adds "Changed Type" step that references wrong columns</h4>
+                            <p>After removing blank columns, old query steps still reference the original column positions and throw errors.</p>
+                        </div>
+                    </div>
+                    <div class="trouble-fix">
+                        <div class="trouble-fix-label">✔ Fix</div>
+                        <p>
+                            In Power Query Editor, expand the <strong>Applied Steps</strong> pane. Delete the step named "Changed Type" (or any step that references the now-deleted column). Then re-apply a new "Changed Type" step by selecting all columns and using <strong>Transform → Detect Data Type</strong>.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <!-- ─── SECTION 8 ─── -->
+        <section class="guide-section" id="quick-checklist">
+            <span class="section-anchor"></span>
+            <div class="section-label-guide">
+                <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                08 — Checklist
+            </div>
+            <h2>Quick <span class="accent">Pre-Load Checklist</span></h2>
+            <p>Run through this checklist every time before opening Power Query on pasted data:</p>
+
+            <ul class="checklist">
+                <li><strong>Pasted using Notepad or Paste Special → Text</strong> — not "Keep Source Formatting"</li>
+                <li><strong>Trailing delimiters removed</strong> from CSV/TSV source before pasting</li>
+                <li><strong>No consecutive spaces</strong> if space is used as a delimiter in Text-to-Columns</li>
+                <li><strong>Ctrl + End lands on the correct last cell</strong> — not beyond the actual data</li>
+                <li><strong>All columns to the right of data are deleted</strong> — not just cleared</li>
+                <li><strong>All rows below data are deleted</strong> — not just cleared</li>
+                <li><strong>File saved (Ctrl + S)</strong> after deletions to reset Used Range</li>
+                <li><strong>Table created from a single cell inside data</strong> — not from a full-column selection</li>
+                <li><strong>Table name is descriptive</strong> and every header is unique and non-blank</li>
+                <li class="warn"><strong>If blank columns still appear in Power Query</strong>, handle them with a "Remove Columns" step in the query rather than repeatedly cleaning Excel manually</li>
+            </ul>
+
+            <div class="callout tip">
+                <div class="callout-icon">🚀</div>
+                <div class="callout-body">
+                    <div class="callout-title">Interview-Ready Insight</div>
+                    <p>If asked about data quality in Excel or Power Query, mention that you always <strong>verify the Used Range with Ctrl + End</strong> before creating a Table, use <strong>Paste Special → Text</strong> or Notepad to strip formatting, and handle recurring blank-column issues directly in Power Query's Applied Steps for <strong>repeatable, self-cleaning refreshes</strong>. This demonstrates structured, professional data hygiene.</p>
+                </div>
+            </div>
+        </section>
+
+        <a href="#top" class="back-to-top">
+            <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+            Back to top
+        </a>
+
+    </main>
+
+    <footer style="border-top:1px solid var(--glass-border);padding:2rem 3rem;text-align:center;background:var(--navy-light);">
+        <p style="font-size:0.8rem;color:var(--text-muted);">
+            &copy; 2026 <span style="color:var(--gold);">Jai Kishan Pal</span> · Finance Analyst · Nottingham, UK 🇬🇧
+            &nbsp;·&nbsp;
+            <a href="index.html" style="color:var(--text-dim);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-dim)'">Portfolio Home</a>
+        </p>
+    </footer>
+
+</body>
+</html>
