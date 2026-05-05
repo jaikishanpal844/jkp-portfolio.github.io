@@ -182,8 +182,13 @@
         .project-footer { display: flex; align-items: center; gap: 0.75rem; }
         .project-link-disabled { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 500; cursor: default; }
         .project-link-disabled svg { width: 14px; height: 14px; stroke: var(--text-muted); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        .project-link-active { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: #34d399; font-weight: 500; text-decoration: none; transition: opacity 0.2s; }
+        .project-link-active:hover { opacity: 0.75; }
+        .project-link-active svg { width: 14px; height: 14px; stroke: #34d399; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
         .project-status { display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--text-muted); padding: 3px 10px; background: rgba(251, 191, 36, 0.06); border: 1px solid rgba(251, 191, 36, 0.1); border-radius: 100px; }
         .project-status .status-dot { width: 5px; height: 5px; border-radius: 50%; background: #fbbf24; animation: pulse 2s infinite; }
+        .project-status.complete { background: rgba(52, 211, 153, 0.08); border-color: rgba(52, 211, 153, 0.25); color: #34d399; }
+        .project-status.complete .status-dot { background: #34d399; }
 
         /* OBJECTIVES / CREDENTIALS */
         #objectives { background: var(--navy-light); }
@@ -203,7 +208,18 @@
         .inprogress-status { background: rgba(59,130,246,0.1); color: #60A5FA; border: 1px solid rgba(59,130,246,0.2); }
         .planned-status { background: rgba(255,255,255,0.04); color: var(--text-muted); border: 1px solid var(--glass-border); }
 
-        @media (max-width: 550px) { .certs-grid { grid-template-columns: 1fr; } }
+        .cert-brick { background: rgba(255,255,255,0.025); border: 1px solid var(--glass-border); border-radius: 14px; padding: 20px 22px; max-width: 1200px; margin: 0 auto 13px; transition: all 0.25s; }
+        .cert-brick:hover { transform: translateY(-2px); }
+        .cert-brick.fmva { background: rgba(59,130,246,0.04); border-color: rgba(59,130,246,0.3); }
+        .cert-brick-header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+        .cert-brick .cert-icon-wrap { background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.25); }
+        .cert-brick.fmva .cert-icon-wrap { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); }
+        .cert-brick-info { flex: 1; min-width: 0; }
+        .cert-pills { display: flex; flex-wrap: wrap; gap: 7px; padding-left: 54px; }
+        .cert-pill { font-size: 11px; font-family: 'JetBrains Mono', monospace; padding: 5px 10px; border-radius: 100px; background: rgba(16,185,129,0.08); color: #34d399; border: 1px solid rgba(16,185,129,0.25); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s; white-space: nowrap; }
+        .cert-pill:hover { background: rgba(16,185,129,0.15); transform: translateY(-1px); }
+
+        @media (max-width: 550px) { .certs-grid { grid-template-columns: 1fr; } .cert-pills { padding-left: 0; } .cert-brick { padding: 16px 18px; } }
 
         /* CONTACT */
         /* COMMERCIAL AWARENESS */
@@ -552,8 +568,8 @@
                     <p>Complete 5-year Discounted Cash Flow model for a FTSE 100 company. Includes revenue forecasting, WACC calculation, sensitivity analysis, and football field valuation chart.</p>
                     <div class="project-tags"><span class="project-tag">Excel</span><span class="project-tag">Financial Modelling</span><span class="project-tag">WACC</span><span class="project-tag">Sensitivity Analysis</span></div>
                     <div class="project-footer">
-                        <span class="project-link-disabled"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg> View on GitHub</span>
-                        <span class="project-status"><span class="status-dot"></span> In Progress</span>
+                        <a href="https://github.com/jaikishanpar844" target="_blank" rel="noopener" class="project-link-active"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg> View on GitHub</a>
+                        <span class="project-status complete"><span class="status-dot"></span> Complete</span>
                     </div>
                 </div>
             </div>
@@ -567,8 +583,8 @@
                     <p>Comprehensive ratio analysis of 10 FTSE 250 companies — covering profitability, liquidity, efficiency, and solvency. Visualised in an interactive Power BI dashboard.</p>
                     <div class="project-tags"><span class="project-tag">Power BI</span><span class="project-tag">Ratio Analysis</span><span class="project-tag">Excel</span></div>
                     <div class="project-footer">
-                        <span class="project-link-disabled"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg> View on GitHub</span>
-                        <span class="project-status"><span class="status-dot"></span> In Progress</span>
+                        <a href="https://github.com/jaikishanpar844" target="_blank" rel="noopener" class="project-link-active"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg> View on GitHub</a>
+                        <span class="project-status complete"><span class="status-dot"></span> Complete</span>
                     </div>
                 </div>
             </div>
@@ -582,8 +598,8 @@
                     <p>VaR and CVaR calculation for a multi-asset portfolio using historical simulation and Monte Carlo methods. Includes efficient frontier optimisation and Sharpe ratio analysis.</p>
                     <div class="project-tags"><span class="project-tag">Python</span><span class="project-tag">Monte Carlo</span><span class="project-tag">VaR / CVaR</span><span class="project-tag">NumPy</span></div>
                     <div class="project-footer">
-                        <span class="project-link-disabled"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg> View on GitHub</span>
-                        <span class="project-status"><span class="status-dot"></span> In Progress</span>
+                        <a href="https://github.com/jaikishanpar844" target="_blank" rel="noopener" class="project-link-active"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg> View on GitHub</a>
+                        <span class="project-status complete"><span class="status-dot"></span> Complete</span>
                     </div>
                 </div>
             </div>
@@ -597,8 +613,8 @@
                     <p>Full equity research report on a UK-listed company — industry overview, competitive positioning, financial analysis, valuation (DCF + comparables), and buy/hold/sell recommendation.</p>
                     <div class="project-tags"><span class="project-tag">Equity Research</span><span class="project-tag">Comparable Analysis</span><span class="project-tag">Word / PDF</span></div>
                     <div class="project-footer">
-                        <span class="project-link-disabled"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg> View on GitHub</span>
-                        <span class="project-status"><span class="status-dot"></span> In Progress</span>
+                        <a href="https://github.com/jaikishanpar844" target="_blank" rel="noopener" class="project-link-active"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg> View on GitHub</a>
+                        <span class="project-status complete"><span class="status-dot"></span> Complete</span>
                     </div>
                 </div>
             </div>
@@ -611,11 +627,41 @@
             <div class="section-label"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 05 — 2026 Objectives</div>
             <h2 class="section-title">Progress &amp; <span class="accent">Credentials</span></h2>
         </div>
+        <div class="cert-brick fmva">
+            <div class="cert-brick-header">
+                <div class="cert-icon-wrap">📊</div>
+                <div class="cert-brick-info">
+                    <div class="cert-card-name">FMVA — Financial Modelling &amp; Valuation</div>
+                    <div class="cert-issuer">Corporate Finance Institute · Modules completed</div>
+                </div>
+                <div class="cert-card-status inprogress-status">In Progress</div>
+            </div>
+            <div class="cert-pills">
+                <a href="https://www.credential.net/cbf25008-0bb9-4578-9340-fa81b303032c#acc.VLZc4NB9" target="_blank" rel="noopener" class="cert-pill">✓ Reading Financial Statements</a>
+                <a href="https://www.credential.net/c5c44ad0-6d99-4e90-9b57-e95242575384#acc.CEZbGle4" target="_blank" rel="noopener" class="cert-pill">✓ Financial Analysis Fundamentals</a>
+                <a href="https://www.credential.net/7ec42021-ccee-4c71-b538-22a04a661162#acc.0dnqN3Et" target="_blank" rel="noopener" class="cert-pill">✓ Financial Modeling Guidelines</a>
+                <a href="https://www.credential.net/0d19cd7c-27cc-4f72-9740-34eb5fb954f1#acc.OvrdbUmw" target="_blank" rel="noopener" class="cert-pill">✓ Intro to 3-Statement Modeling</a>
+            </div>
+        </div>
+        <div class="cert-brick">
+            <div class="cert-brick-header">
+                <div class="cert-icon-wrap">🎓</div>
+                <div class="cert-brick-info">
+                    <div class="cert-card-name">Additional Certifications</div>
+                    <div class="cert-issuer">Bloomberg · CFI · Udemy</div>
+                </div>
+            </div>
+            <div class="cert-pills">
+                <a href="certs/bloomberg-market-concepts.pdf" target="_blank" rel="noopener" class="cert-pill">✓ Bloomberg Market Concepts (BMC)</a>
+                <a href="certs/bloomberg-finance-fundamentals.pdf" target="_blank" rel="noopener" class="cert-pill">✓ Bloomberg Finance Fundamentals</a>
+                <a href="certs/bloomberg-spreadsheet-analysis.pdf" target="_blank" rel="noopener" class="cert-pill">✓ Bloomberg Spreadsheet Analysis</a>
+                <a href="certs/bloomberg-esg.pdf" target="_blank" rel="noopener" class="cert-pill">✓ Bloomberg ESG</a>
+                <a href="certs/excel-udemy.pdf" target="_blank" rel="noopener" class="cert-pill">✓ MS Excel Beginner to Advanced (Udemy)</a>
+            </div>
+        </div>
         <div class="certs-grid">
-            <div class="cert-card-old active"><div class="cert-icon-wrap">🏆</div><div><div class="cert-card-name">Bloomberg Market Concepts (BMC)</div><div class="cert-issuer">Bloomberg LP</div></div><div class="cert-card-status active-status">Completed</div></div>
-            <div class="cert-card-old inprogress"><div class="cert-icon-wrap">📊</div><div><div class="cert-card-name">FMVA — Financial Modelling &amp; Valuation</div><div class="cert-issuer">Corporate Finance Institute</div></div><div class="cert-card-status inprogress-status">In Progress</div></div>
-            <div class="cert-card-old planned"><div class="cert-icon-wrap">📉</div><div><div class="cert-card-name">MOS Excel Expert + Power BI (PL-300)</div><div class="cert-issuer">Microsoft</div></div><div class="cert-card-status planned-status">Planned</div></div>
             <div class="cert-card-old planned"><div class="cert-icon-wrap">📘</div><div><div class="cert-card-name">CFA Level I</div><div class="cert-issuer">CFA Institute</div></div><div class="cert-card-status planned-status">Planned</div></div>
+            <div class="cert-card-old planned"><div class="cert-icon-wrap">📉</div><div><div class="cert-card-name">MOS Excel Expert + Power BI (PL-300)</div><div class="cert-issuer">Microsoft</div></div><div class="cert-card-status planned-status">Planned</div></div>
         </div>
     </section>
 
@@ -717,7 +763,6 @@
         <div class="footer-links">
             <a href="https://www.linkedin.com/in/jaik-pal/" target="_blank">LinkedIn</a>
             <a href="mailto:jaikishanpal844@gmail.com">Email</a>
-            <a href= target="_blank" rel="noopener">Progress</a>
         </div>
     </footer>
 
