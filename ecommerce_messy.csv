@@ -1,0 +1,16 @@
+Order_ID,Order_Date,Customer_Name,Region,Product,Quantity,Unit_Price,Total_Amount,Status
+1001, 03/02/2024 ,  alice johnson , east , whey powder , 2 , $35.00 , $70.00 , completed
+1002,02-01-2024,  BOB SMITH  ,north,protein bar,10,$1.90,$19.00,Completed
+1003, 2024/02/02 , carol white,south, Whey Powder ,2,$35.00,$70.00,COMPLETED
+1004,03/02/2024,david  brown,East,bcaas,3,$20.00,$60.00,completed
+1005, 01-02-2024 ,,North,creatine,1,$20.00,$20.00,Completed
+1006,2024-02-05,  emily davis ,SOUTH,protein shake,2,$25.00,$50.00,completed
+1007,07/02/2024,frank miller,west, Whey Powder ,3,$35.00,$105.00,Completed
+1008,05/02/2024,  Grace Lee  ,north, (blank) ,5,$19.00,$95.00,completed
+1009,08/02/2024,henry clark,EAST, whey powder ,2,$35.00,$70.00,Completed
+1010, 02/02/2024,ivan jones,South,Creatine,1,$20.00,$20.00,completed
+1011,07/02/2024,julia kim,North,bcaas,2,$20.00,$40.00,Completed
+1012,03/02/2024,,east,protein shake,1,$25.00,$25.00,Pending
+1013,04/02/2024,carol white,SOUTH, Protein Bar ,10,$1.90,$19.00,completed
+1014,05/02/2024,bob smith,north,whey powder,2,$35.00,$70.00,Completed
+1015,08/02/2024,alice johnson,East,creatine,1,$20.00,$20.00,Completed
